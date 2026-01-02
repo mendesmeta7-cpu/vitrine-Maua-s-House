@@ -22,7 +22,7 @@ const Navbar = () => {
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled ? 'bg-white/80 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'}`}>
             <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
                 <a href="#" className="flex items-center gap-3 group">
-                    <img src="/logo.png" alt="Maua's House Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
+                    <img src={`${import.meta.env.BASE_URL}logo.png`} alt="Maua's House Logo" className="h-10 w-auto object-contain transition-transform group-hover:scale-105" />
                     <span className={`text-xl font-serif font-bold tracking-tight ${scrolled ? 'text-maua-text' : 'text-maua-text md:text-white'} transition-colors`}>
                         Maua’s House
                     </span>

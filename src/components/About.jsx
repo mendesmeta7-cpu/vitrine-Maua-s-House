@@ -10,7 +10,7 @@ const About = () => {
                     {/* Main About Image */}
                     <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-xl group relative">
                         <img
-                            src="/about-image.jpg"
+                            src={`${import.meta.env.BASE_URL}about-image.jpg`}
                             alt="Maua's House - Chaque fleur raconte une histoire"
                             className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                         />

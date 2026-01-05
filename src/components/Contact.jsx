@@ -56,7 +56,7 @@ const Contact = () => {
                 {/* Simple Map Placeholder or Decorative Image */}
                 <div className="relative h-96 w-full rounded-2xl overflow-hidden bg-stone-800 border border-stone-700">
                     <iframe
-                        src="https://www.google.com/maps/embed?pb=!1m16!1m12!1m3!1d10639.83156242381!2d15.280829606568714!3dj-4.323703955078228!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!2m1!1s9%2C%20avenue%20Mpeti%20%E2%80%93%20Quartier%20Socimat%20%20Kinshasa%2C%20RDC!5e0!3m2!1sfr!2scd!4v1767565444580!5m2!1sfr!2scd"
+                        src="https://www.google.com/maps/embed?pb=!1m12!1m8!1m3!1d4163.708223987606!2d15.279584470522739!3d-4.323204384195785!3m2!1i1024!2i768!4f13.1!2m1!1s9%2C%20avenue%20Mpeti%20%E2%80%93%20Quartier%20Socimat%20%20Kinshasa%2C%20RDC!5e0!3m2!1sfr!2scd!4v1767578552692!5m2!1sfr!2scd"
                         className="w-full h-full border-0"
                         allowFullScreen=""
                         loading="lazy"

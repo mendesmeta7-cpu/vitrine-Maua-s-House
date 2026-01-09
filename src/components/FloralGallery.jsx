@@ -167,15 +167,15 @@ const categories = [
                 title: 'Bouquet douceur rose rouge',
                 images: [
                     {
-                        url: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?q=80&w=2032',
+                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-douceur-rose-rouge-1.jpg`,
                         name: 'Nuage Pastel',
                     },
                     {
-                        url: 'https://images.unsplash.com/photo-1498926955099-fc9161a06734?q=80&w=2000',
+                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-douceur-rose-rouge-2.jpg`,
                         name: 'Tendresse Infinie',
                     },
                     {
-                        url: 'https://images.unsplash.com/photo-1457089328109-e5d9bd499191?q=80&w=2000',
+                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-douceur-rose-rouge-3.jpg`,
                         name: 'Charme Romantique',
                     }
                 ]

@@ -150,15 +150,15 @@ const categories = [
                 title: 'Box à fleurs romantique',
                 images: [
                     {
-                        url: 'https://images.unsplash.com/photo-1563241527-3004b7be0fee?q=80&w=1974',
+                        url: `${import.meta.env.BASE_URL}images/gallery/box-fleurs-romantique-1.jpg`,
                         name: 'Flower Box Carrée',
                     },
                     {
-                        url: 'https://images.unsplash.com/photo-1520302630591-a6e35002a28c?q=80&w=2000',
+                        url: `${import.meta.env.BASE_URL}images/gallery/box-fleurs-romantique-2.jpg`,
                         name: 'Macarons et Fleurs',
                     },
                     {
-                        url: 'https://images.unsplash.com/photo-1582236894371-33230d709088?q=80&w=2000',
+                        url: `${import.meta.env.BASE_URL}images/gallery/box-fleurs-romantique-3.jpg`,
                         name: 'Écrin de Luxe',
                     }
                 ]

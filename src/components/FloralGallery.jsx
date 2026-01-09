@@ -133,15 +133,15 @@ const categories = [
                 title: 'Grand Bouquet Rouge Passion',
                 images: [
                     {
-                        url: 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1968',
+                        url: `${import.meta.env.BASE_URL}images/gallery/grand-bouquet-rouge-passion-1.jpg`,
                         name: '101 Roses Rouges',
                     },
                     {
-                        url: 'https://images.unsplash.com/photo-1559563362-c667ba5f5480?q=80&w=2000',
+                        url: `${import.meta.env.BASE_URL}images/gallery/grand-bouquet-rouge-passion-2.jpg`,
                         name: 'Passion Intense',
                     },
                     {
-                        url: 'https://images.unsplash.com/photo-1614742385227-2fa942f9ae51?q=80&w=2000',
+                        url: `${import.meta.env.BASE_URL}images/gallery/grand-bouquet-rouge-passion-3.jpg`,
                         name: 'Velours Cramoisi',
                     }
                 ]

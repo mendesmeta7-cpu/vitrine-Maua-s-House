@@ -88,7 +88,7 @@ const categories = [
                 ]
             },
             {
-                title: 'Bouquet de Sympathie Blanc',
+                title: 'Composition Florale de Paix',
                 images: [
                     {
                         url: `${import.meta.env.BASE_URL}images/gallery/bouquet-sympathie-1.jpg`,
@@ -105,7 +105,7 @@ const categories = [
                 ]
             },
             {
-                title: 'Composition Florale de Paix',
+                title: 'Gerbe de fleurs enterrement',
                 images: [
                     {
                         url: `${import.meta.env.BASE_URL}images/gallery/composition-paix-1.jpg`,
@@ -147,7 +147,7 @@ const categories = [
                 ]
             },
             {
-                title: 'Boîte à Fleurs Romantique',
+                title: 'Box à fleurs romantique',
                 images: [
                     {
                         url: 'https://images.unsplash.com/photo-1563241527-3004b7be0fee?q=80&w=1974',
@@ -164,7 +164,7 @@ const categories = [
                 ]
             },
             {
-                title: 'Composition Douceur Rose',
+                title: 'Bouquet douceur rose rouge',
                 images: [
                     {
                         url: 'https://images.unsplash.com/photo-1507290439931-a861b5a38200?q=80&w=2032',

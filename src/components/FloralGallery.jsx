@@ -49,15 +49,15 @@ const categories = [
                 title: 'Centre de Table Festif',
                 images: [
                     {
-                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-1.jpg`,
+                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-v2-1.jpg`,
                         name: 'Élégance Dorée',
                     },
                     {
-                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-2.jpg`,
+                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-v2-2.jpg`,
                         name: 'Dîner aux Chandelles',
                     },
                     {
-                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-3.jpg`,
+                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-v2-3.jpg`,
                         name: 'Ambiance Feutrée',
                     }
                 ]

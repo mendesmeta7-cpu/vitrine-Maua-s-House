@@ -317,10 +317,10 @@ const FloralGallery = () => {
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0, y: -15 }}
                         transition={{ duration: 0.4 }}
-                        className="grid md:grid-cols-2 gap-8 items-stretch bg-white rounded-3xl p-6 md:p-8 shadow-xl border border-stone-100"
+                        className="grid md:grid-cols-2 gap-4 md:gap-8 items-stretch bg-white rounded-3xl p-4 md:p-8 shadow-xl border border-stone-100 overflow-hidden"
                     >
                         {/* --- LEFT: Image Area --- */}
-                        <div className="relative flex flex-col gap-4">
+                        <div className="relative flex flex-col gap-3 min-w-0">
                             {/* Large Image */}
                             <div className="relative aspect-[4/5] md:aspect-square w-full rounded-2xl overflow-hidden shadow-inner bg-stone-100">
                                 <AnimatePresence mode="wait">
@@ -359,7 +359,7 @@ const FloralGallery = () => {
                                     <button
                                         key={idx}
                                         onClick={() => handleImageSelect(idx)}
-                                        className={`relative w-20 h-20 rounded-lg overflow-hidden border-2 transition-all duration-300
+                                        className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 flex-shrink-0
                                             ${idx === imgIndex ? 'border-maua-primary ring-2 ring-pink-100 scale-105 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
                                     >
                                         <img src={img.url} alt="" className="w-full h-full object-cover" />
@@ -369,7 +369,7 @@ const FloralGallery = () => {
                         </div>
 
                         {/* --- RIGHT: Content Area --- */}
-                        <div className="flex flex-col justify-center space-y-8 md:pl-6 p-2">
+                        <div className="flex flex-col justify-center space-y-4 md:space-y-8 md:pl-6 p-1 min-w-0">
 
                             {/* Header Info */}
                             <div>
@@ -377,7 +377,7 @@ const FloralGallery = () => {
                                     <span className={`w-2 h-2 rounded-full ${activeTab === 0 ? 'bg-pink-400' : activeTab === 1 ? 'bg-stone-400' : 'bg-red-400'}`}></span>
                                     {currentCategory.label}
                                 </div>
-                                <h3 className="text-3xl md:text-4xl font-serif font-bold text-maua-text leading-tight">
+                                <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-maua-text leading-tight break-words">
                                     {currentSubCat.title}
                                 </h3>
                             </div>
@@ -403,7 +403,7 @@ const FloralGallery = () => {
                                     className="w-full bg-maua-green hover:bg-emerald-800 text-white px-8 py-4 rounded-xl font-medium transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center gap-3 group"
                                 >
                                     <span>Intéressé</span>
-                                    <MessageCircle size={20} className="group-hover:rotate-12 transition-transform" />
+                                    <MessageCircle size={20} className="group-hover:rotate-12 transition-transform flex-shrink-0" />
                                 </button>
                                 <p className="text-center text-xs text-stone-400 mt-3 flex items-center justify-center gap-1">
                                     <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>

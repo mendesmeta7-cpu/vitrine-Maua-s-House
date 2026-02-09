@@ -76,7 +76,7 @@ const FloralGallery = () => {
                                 <div className="absolute inset-0 flex flex-col justify-end p-5">
                                     <div className="transform transition-transform duration-300 group-hover:-translate-y-1">
                                         <h3 className="text-white font-serif font-bold text-lg leading-tight mb-1">{product.name}</h3>
-                                        <p className="text-maua-primary font-bold text-base">{product.price} $</p>
+                                        <p className="text-maua-primary font-bold text-base">{product.price} {product.currency || "$"}</p>
                                     </div>
 
                                     <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100">

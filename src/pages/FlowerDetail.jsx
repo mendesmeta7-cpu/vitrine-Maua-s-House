@@ -50,19 +50,19 @@ const FlowerDetail = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
-            await createOrder({
+            const orderId = await createOrder({
                 productId: product.id,
                 productName: product.name,
                 productPrice: product.price,
+                currency: product.currency || 'USD',
                 imageUrl: product.imageUrl,
                 ...formData
             });
-            setOrderSuccess(true);
-            setFormData({ customerName: '', phone: '', address: '', message: '' });
+            // Redirect to Payment Page
+            navigate(`/payment/${orderId}`);
         } catch (err) {
             console.error("Order failed:", err);
             alert("Une erreur est survenue lors de la commande. Veuillez réessayer.");
-        } finally {
             setSubmitting(false);
         }
     };
@@ -72,6 +72,7 @@ const FlowerDetail = () => {
             id: product.id,
             name: product.name,
             price: product.price,
+            currency: product.currency || "USD",
             imageUrl: product.imageUrl,
             quantity: 1
         });
@@ -144,7 +145,7 @@ const FlowerDetail = () => {
                                 {product.name}
                             </h1>
                             <p className="text-3xl font-medium text-maua-primary mb-6">
-                                {product.price} $
+                                {product.price} {product.currency || "$"}
                             </p>
                             <p className="text-stone-600 text-lg leading-relaxed">
                                 {product.description}
@@ -165,114 +166,92 @@ const FlowerDetail = () => {
                             </div>
                         </div>
 
-                        {!orderSuccess ? (
-                            <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-stone-100">
-                                <h3 className="text-xl font-serif font-bold text-maua-dark mb-6 flex items-center gap-2">
-                                    <MessageCircle size={24} className="text-maua-primary" />
-                                    Commander directement
-                                </h3>
+                        <div className="bg-white p-6 md:p-8 rounded-3xl shadow-lg border border-stone-100">
+                            <h3 className="text-xl font-serif font-bold text-maua-dark mb-6 flex items-center gap-2">
+                                <MessageCircle size={24} className="text-maua-primary" />
+                                Commander directement
+                            </h3>
 
-                                <form onSubmit={handleOrderSubmit} className="space-y-4">
-                                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                        <div className="space-y-1">
-                                            <label className="text-xs font-bold text-stone-500 uppercase">Votre nom</label>
-                                            <input
-                                                type="text"
-                                                name="customerName"
-                                                required
-                                                value={formData.customerName}
-                                                onChange={handleInputChange}
-                                                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all"
-                                                placeholder="Jean Dupont"
-                                            />
-                                        </div>
-                                        <div className="space-y-1">
-                                            <label className="text-xs font-bold text-stone-500 uppercase">Téléphone</label>
-                                            <input
-                                                type="tel"
-                                                name="phone"
-                                                required
-                                                value={formData.phone}
-                                                onChange={handleInputChange}
-                                                className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all"
-                                                placeholder="+243 ..."
-                                            />
-                                        </div>
-                                    </div>
-
+                            <form onSubmit={handleOrderSubmit} className="space-y-4">
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-1">
-                                        <label className="text-xs font-bold text-stone-500 uppercase">Adresse de livraison</label>
+                                        <label className="text-xs font-bold text-stone-500 uppercase">Votre nom</label>
                                         <input
                                             type="text"
-                                            name="address"
+                                            name="customerName"
                                             required
-                                            value={formData.address}
+                                            value={formData.customerName}
                                             onChange={handleInputChange}
                                             className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all"
-                                            placeholder="Quartier, Avenue, Numéro..."
+                                            placeholder="Jean Dupont"
                                         />
                                     </div>
-
                                     <div className="space-y-1">
-                                        <label className="text-xs font-bold text-stone-500 uppercase">Message (Optionnel)</label>
-                                        <textarea
-                                            name="message"
-                                            value={formData.message}
+                                        <label className="text-xs font-bold text-stone-500 uppercase">Téléphone</label>
+                                        <input
+                                            type="tel"
+                                            name="phone"
+                                            required
+                                            value={formData.phone}
                                             onChange={handleInputChange}
-                                            rows="3"
-                                            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all resize-none"
-                                            placeholder="Un petit mot pour accompagner les fleurs ?"
-                                        ></textarea>
+                                            className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all"
+                                            placeholder="+243 ..."
+                                        />
                                     </div>
-
-                                    <div className="pt-4 flex flex-col md:flex-row gap-4">
-                                        <button
-                                            type="submit"
-                                            disabled={submitting}
-                                            className="flex-1 bg-maua-dark text-white py-4 rounded-xl font-bold hover:bg-maua-primary transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
-                                        >
-                                            {submitting ? (
-                                                <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-                                            ) : (
-                                                "Commander maintenant"
-                                            )}
-                                        </button>
-
-                                        <button
-                                            type="button"
-                                            onClick={handleAddToCart}
-                                            className="flex-1 bg-stone-100 text-maua-dark py-4 rounded-xl font-bold hover:bg-stone-200 transition-colors flex justify-center items-center gap-2 border border-stone-200"
-                                        >
-                                            <ShoppingBag size={20} />
-                                            Ajouter au panier
-                                        </button>
-                                    </div>
-                                    <p className="text-xs text-stone-400 text-center mt-2">
-                                        Paiement à la livraison ou par mobile money après confirmation.
-                                    </p>
-                                </form>
-                            </div>
-                        ) : (
-                            <motion.div
-                                initial={{ opacity: 0, scale: 0.95 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                                className="bg-green-50 border border-green-200 rounded-3xl p-8 text-center space-y-4"
-                            >
-                                <div className="w-16 h-16 bg-green-100 text-green-600 rounded-full flex items-center justify-center mx-auto mb-2">
-                                    <Check size={32} />
                                 </div>
-                                <h3 className="text-2xl font-serif font-bold text-green-800">Merci pour votre commande !</h3>
-                                <p className="text-green-700">
-                                    Votre demande a été enregistrée avec succès. Notre équipe va vous contacter au <strong>{formData.phone}</strong> pour confirmer la livraison.
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-stone-500 uppercase">Adresse de livraison</label>
+                                    <input
+                                        type="text"
+                                        name="address"
+                                        required
+                                        value={formData.address}
+                                        onChange={handleInputChange}
+                                        className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all"
+                                        placeholder="Quartier, Avenue, Numéro..."
+                                    />
+                                </div>
+
+                                <div className="space-y-1">
+                                    <label className="text-xs font-bold text-stone-500 uppercase">Message (Optionnel)</label>
+                                    <textarea
+                                        name="message"
+                                        value={formData.message}
+                                        onChange={handleInputChange}
+                                        rows="3"
+                                        className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all resize-none"
+                                        placeholder="Un petit mot pour accompagner les fleurs ?"
+                                    ></textarea>
+                                </div>
+
+                                <div className="pt-4 flex flex-col md:flex-row gap-4">
+                                    <button
+                                        type="submit"
+                                        disabled={submitting}
+                                        className="flex-1 bg-maua-dark text-white py-4 rounded-xl font-bold hover:bg-maua-primary transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center gap-2"
+                                    >
+                                        {submitting ? (
+                                            <span className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+                                        ) : (
+                                            "Payer et Commander"
+                                        )}
+                                    </button>
+
+                                    <button
+                                        type="button"
+                                        onClick={handleAddToCart}
+                                        className="flex-1 bg-stone-100 text-maua-dark py-4 rounded-xl font-bold hover:bg-stone-200 transition-colors flex justify-center items-center gap-2 border border-stone-200"
+                                    >
+                                        <ShoppingBag size={20} />
+                                        Ajouter au panier
+                                    </button>
+                                </div>
+                                <p className="text-xs text-stone-400 text-center mt-2">
+                                    Vous serez redirigé vers le paiement sécurisé.
                                 </p>
-                                <button
-                                    onClick={() => setOrderSuccess(false)}
-                                    className="text-green-800 font-bold underline mt-4 hover:text-green-900"
-                                >
-                                    Passer une autre commande
-                                </button>
-                            </motion.div>
-                        )}
+                            </form>
+                        </div>
                     </motion.div>
                 </div>
             </div>

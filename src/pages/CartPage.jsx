@@ -9,7 +9,7 @@ const CartPage = () => {
 
     const handleCheckout = () => {
         // Placeholder for checkout logic (e.g., WhatsApp redirect or Payment Gateway)
-        const message = `Bonjour, je souhaite commander : \n${cartItems.map(item => `- ${item.name} (${item.quantity}x)`).join('\n')}\nTotal: ${cartTotal} $`;
+        const message = `Bonjour, je souhaite commander : \n${cartItems.map(item => `- ${item.name} (${item.quantity}x)`).join('\n')}\nTotal: ${cartTotal} ${cartItems[0]?.currency || '$'}`;
         const whatsappUrl = `https://wa.me/243907444762?text=${encodeURIComponent(message)}`;
         window.open(whatsappUrl, '_blank');
     };
@@ -38,7 +38,7 @@ const CartPage = () => {
                                     </div>
                                     <div className="flex-1">
                                         <h3 className="font-serif text-lg text-maua-dark">{item.name}</h3>
-                                        <p className="text-maua-primary font-medium">{item.price} $</p>
+                                        <p className="text-maua-primary font-medium">{item.price} {item.currency || "$"}</p>
                                     </div>
                                     <div className="flex items-center gap-3">
                                         <div className="flex items-center border rounded-lg">
@@ -74,7 +74,7 @@ const CartPage = () => {
                                 <div className="space-y-3 mb-6 border-b pb-6">
                                     <div className="flex justify-between text-gray-600">
                                         <span>Sous-total</span>
-                                        <span>{cartTotal} $</span>
+                                        <span>{cartTotal} {cartItems[0]?.currency || "$"}</span>
                                     </div>
                                     <div className="flex justify-between text-gray-600">
                                         <span>Livraison</span>
@@ -83,7 +83,7 @@ const CartPage = () => {
                                 </div>
                                 <div className="flex justify-between text-xl font-medium text-maua-dark mb-6">
                                     <span>Total</span>
-                                    <span>{cartTotal} $</span>
+                                    <span>{cartTotal} {cartItems[0]?.currency || "$"}</span>
                                 </div>
                                 <button
                                     onClick={handleCheckout}

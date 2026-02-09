@@ -1,6 +1,7 @@
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import ProductPage from './pages/ProductPage';
+import PaymentPage from './pages/PaymentPage';
 import CartPage from './pages/CartPage';
 import Login from './pages/admin/Login';
 import AdminDashboard from './pages/admin/Dashboard';
@@ -18,6 +19,7 @@ function App() {
         <Route path="/galerie" element={<Gallery />} />
         <Route path="/galerie/:id" element={<FlowerDetail />} />
         <Route path="/product/:id" element={<ProductPage />} />
+        <Route path="/payment/:orderId" element={<PaymentPage />} />
         <Route path="/cart" element={<CartPage />} />
 
         <Route path="/login" element={<Login />} />

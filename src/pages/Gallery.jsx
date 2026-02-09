@@ -135,7 +135,7 @@ const Gallery = () => {
                                                 {CATEGORY_CONFIG[flower.category]?.label || flower.category}
                                             </span>
                                             <span className="font-serif text-xl font-bold text-maua-dark">
-                                                {flower.price} $
+                                                {flower.price} {flower.currency || "$"}
                                             </span>
                                         </div>
                                         <h3 className="text-xl font-serif font-bold text-stone-800 mb-2 group-hover:text-maua-primary transition-colors">

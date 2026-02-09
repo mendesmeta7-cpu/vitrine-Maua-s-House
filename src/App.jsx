@@ -7,23 +7,27 @@ import AdminDashboard from './pages/admin/Dashboard';
 import ProtectedRoute from './components/admin/ProtectedRoute';
 import Gallery from './pages/Gallery';
 import FlowerDetail from './pages/FlowerDetail';
+import ScrollHandler from './components/ScrollHandler';
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/galerie" element={<Gallery />} />
-      <Route path="/galerie/:id" element={<FlowerDetail />} />
-      <Route path="/product/:id" element={<ProductPage />} />
-      <Route path="/cart" element={<CartPage />} />
+    <>
+      <ScrollHandler />
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/galerie" element={<Gallery />} />
+        <Route path="/galerie/:id" element={<FlowerDetail />} />
+        <Route path="/product/:id" element={<ProductPage />} />
+        <Route path="/cart" element={<CartPage />} />
 
-      <Route path="/login" element={<Login />} />
-      <Route path="/admin" element={
-        <ProtectedRoute>
-          <AdminDashboard />
-        </ProtectedRoute>
-      } />
-    </Routes>
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin" element={
+          <ProtectedRoute>
+            <AdminDashboard />
+          </ProtectedRoute>
+        } />
+      </Routes>
+    </>
   );
 }
 

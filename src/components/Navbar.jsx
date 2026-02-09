@@ -27,7 +27,7 @@ const Navbar = () => {
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled || location.pathname !== '/' ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'}`}>
             <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-2 group">
-                    <span className={`text-xl font-serif font-bold tracking-tight ${scrolled || location.pathname !== '/' ? 'text-maua-dark' : 'text-maua-dark md:text-white'} transition-colors`}>
+                    <span className={`text-xl font-serif font-bold tracking-tight text-maua-dark transition-colors`}>
                         Maua’s House
                     </span>
                 </Link>
@@ -39,7 +39,7 @@ const Navbar = () => {
                             <a
                                 key={link.name}
                                 href={link.href}
-                                className={`text-sm font-medium tracking-wide transition-colors hover:text-maua-primary ${scrolled || location.pathname !== '/' ? 'text-maua-dark' : 'text-maua-dark md:text-white'}`}
+                                className={`text-sm font-medium tracking-wide transition-colors hover:text-maua-primary text-maua-dark`}
                             >
                                 {link.name}
                             </a>
@@ -47,7 +47,7 @@ const Navbar = () => {
                             <Link
                                 key={link.name}
                                 to={link.href}
-                                className={`text-sm font-medium tracking-wide transition-colors hover:text-maua-primary ${scrolled || location.pathname !== '/' ? (location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href)) ? 'text-maua-primary font-bold' : 'text-maua-dark') : 'text-maua-dark md:text-white'}`}
+                                className={`text-sm font-medium tracking-wide transition-colors hover:text-maua-primary ${location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href)) ? 'text-maua-primary font-bold' : 'text-maua-dark'}`}
                             >
                                 {link.name}
                             </Link>

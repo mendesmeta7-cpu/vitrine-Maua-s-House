@@ -72,7 +72,7 @@ const FlowerDetail = () => {
             id: product.id,
             name: product.name,
             price: product.price,
-            image: product.imageUrl,
+            imageUrl: product.imageUrl,
             quantity: 1
         });
         // Feedback is handled by Navbar cart badge, or we could add a toast here

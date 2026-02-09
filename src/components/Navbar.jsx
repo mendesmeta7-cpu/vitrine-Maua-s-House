@@ -35,23 +35,16 @@ const Navbar = () => {
                 {/* Desktop Menu */}
                 <div className="hidden md:flex gap-8 items-center">
                     {links.map((link) => (
-                        link.href.startsWith('/#') ? (
-                            <a
-                                key={link.name}
-                                href={link.href}
-                                className={`text-sm font-medium tracking-wide transition-colors hover:text-maua-primary text-maua-dark`}
-                            >
-                                {link.name}
-                            </a>
-                        ) : (
-                            <Link
-                                key={link.name}
-                                to={link.href}
-                                className={`text-sm font-medium tracking-wide transition-colors hover:text-maua-primary ${location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href)) ? 'text-maua-primary font-bold' : 'text-maua-dark'}`}
-                            >
-                                {link.name}
-                            </Link>
-                        )
+                        <Link
+                            key={link.name}
+                            to={link.href}
+                            className={`text-sm font-medium tracking-wide transition-colors hover:text-maua-primary ${location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href))
+                                ? 'text-maua-primary font-bold'
+                                : 'text-maua-dark'
+                                }`}
+                        >
+                            {link.name}
+                        </Link>
                     ))}
 
                     <Link to="/cart" className="relative p-2 text-maua-primary hover:text-maua-primary-dark transition-colors">
@@ -63,12 +56,12 @@ const Navbar = () => {
                         )}
                     </Link>
 
-                    <a
-                        href="/#contact"
+                    <Link
+                        to="/#contact"
                         className="px-5 py-2.5 rounded-full bg-maua-dark text-white text-sm font-medium hover:bg-maua-primary transition-colors duration-300"
                     >
                         Nous contacter
-                    </a>
+                    </Link>
                 </div>
 
                 {/* Mobile Toggle */}
@@ -98,25 +91,17 @@ const Navbar = () => {
                     >
                         <div className="flex flex-col p-6 gap-2">
                             {links.map((link) => (
-                                link.href.startsWith('/#') ? (
-                                    <a
-                                        key={link.name}
-                                        href={link.href}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className="text-lg font-medium text-maua-dark py-3 block hover:text-maua-primary transition-colors"
-                                    >
-                                        {link.name}
-                                    </a>
-                                ) : (
-                                    <Link
-                                        key={link.name}
-                                        to={link.href}
-                                        onClick={() => setMobileMenuOpen(false)}
-                                        className={`text-lg font-medium py-3 block hover:text-maua-primary transition-colors ${location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href)) ? 'text-maua-primary font-bold' : 'text-maua-dark'}`}
-                                    >
-                                        {link.name}
-                                    </Link>
-                                )
+                                <Link
+                                    key={link.name}
+                                    to={link.href}
+                                    onClick={() => setMobileMenuOpen(false)}
+                                    className={`text-lg font-medium py-3 block hover:text-maua-primary transition-colors ${location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href))
+                                            ? 'text-maua-primary font-bold'
+                                            : 'text-maua-dark'
+                                        }`}
+                                >
+                                    {link.name}
+                                </Link>
                             ))}
                         </div>
                     </motion.div>

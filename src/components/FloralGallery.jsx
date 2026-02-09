@@ -69,14 +69,19 @@ const FloralGallery = () => {
                                     alt={product.name}
                                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                                 />
-                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+                                {/* Persistent Gradient Overlay */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent group-hover:from-black/80 transition-all duration-300" />
 
-                                <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                                    <h3 className="text-white font-serif font-bold text-lg">{product.name}</h3>
-                                    <p className="text-white/90 text-sm font-medium">{product.price} $</p>
-                                    <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm p-2 rounded-full text-white">
-                                        <Eye size={16} />
-                                    </span>
+                                {/* Info Container - Always Visible Name/Price, Hovering Eye */}
+                                <div className="absolute inset-0 flex flex-col justify-end p-5">
+                                    <div className="transform transition-transform duration-300 group-hover:-translate-y-1">
+                                        <h3 className="text-white font-serif font-bold text-lg leading-tight mb-1">{product.name}</h3>
+                                        <p className="text-maua-primary font-bold text-base">{product.price} $</p>
+                                    </div>
+
+                                    <div className="absolute top-4 right-4 bg-white/20 backdrop-blur-md p-2 rounded-full text-white opacity-0 group-hover:opacity-100 transition-all duration-300 transform scale-75 group-hover:scale-100">
+                                        <Eye size={18} />
+                                    </div>
                                 </div>
                             </motion.div>
                         ))}

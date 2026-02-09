@@ -1,280 +1,31 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Heart, Sparkles, Calendar, ArrowRight, ArrowLeft, MessageCircle } from 'lucide-react';
+import { ArrowRight, Eye } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import Section from './Section';
-
-// --- DATA STRUCTURE (3 Levels: Category -> SubCategories -> Images) ---
-const categories = [
-    {
-        id: 'celebrations',
-        label: 'Célébrations & Événements',
-        icon: Calendar,
-        color: 'bg-pink-100 text-pink-600',
-        subCategories: [
-            {
-                title: 'Mariage Bohème Chic',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/mariage-boheme-1.jpg`,
-                        name: 'Bouquet Bohème Pastel',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/mariage-boheme-2.jpg`,
-                        name: 'Roses Blanches & Verdure',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/mariage-boheme-3.jpg`,
-                        name: 'Composition Lys & Roses',
-                    }
-                ]
-            },
-            {
-                title: 'Bouquet d\'Anniversaire Éclatant',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/anniversaire-eclatant-1.jpg`,
-                        name: 'Explosion de Couleurs',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/anniversaire-eclatant-2.jpg`,
-                        name: 'Mix Roses et Pivoines',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/anniversaire-eclatant-3.jpg`,
-                        name: 'Cadeau Floral Joyeux',
-                    }
-                ]
-            },
-            {
-                title: 'Centre de Table Festif',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-v2-1.jpg`,
-                        name: 'Élégance Dorée',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-v2-2.jpg`,
-                        name: 'Dîner aux Chandelles',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/centre-table-festif-v2-3.jpg`,
-                        name: 'Ambiance Feutrée',
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        id: 'hommages',
-        label: 'Hommages & Souvenirs',
-        icon: Sparkles,
-        color: 'bg-stone-100 text-stone-600',
-        subCategories: [
-            {
-                title: 'Couronne de la Mémoire',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/couronne-memoire-1.jpg`,
-                        name: 'Couronne Blanche Pure',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/couronne-memoire-2.jpg`,
-                        name: 'Détail Fleurs Délicates',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/couronne-memoire-3.jpg`,
-                        name: 'Hommage Solennel',
-                    }
-                ]
-            },
-            {
-                title: 'Composition Florale de Paix',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-sympathie-1.jpg`,
-                        name: 'Lys et Roses Blancs',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-sympathie-2.jpg`,
-                        name: 'Touche de Verdure',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-sympathie-3.jpg`,
-                        name: 'Simplicité Émouvante',
-                    }
-                ]
-            },
-            {
-                title: 'Gerbe de fleurs enterrement',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/composition-paix-1.jpg`,
-                        name: 'Hortensias et Roses Douces',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/composition-paix-2.jpg`,
-                        name: 'Roses Rouges et Lys',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/composition-paix-3.jpg`,
-                        name: 'Cœur Fleuri Varié',
-                    }
-                ]
-            }
-        ]
-    },
-    {
-        id: 'amour',
-        label: 'Amour & Émotions',
-        icon: Heart,
-        color: 'bg-red-50 text-red-500',
-        subCategories: [
-            {
-                title: 'Grand Bouquet Rouge Passion',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/grand-bouquet-rouge-passion-1.jpg`,
-                        name: '101 Roses Rouges',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/grand-bouquet-rouge-passion-2.jpg`,
-                        name: 'Passion Intense',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/grand-bouquet-rouge-passion-3.jpg`,
-                        name: 'Velours Cramoisi',
-                    }
-                ]
-            },
-            {
-                title: 'Box à fleurs romantique',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/box-fleurs-romantique-1.jpg`,
-                        name: 'Flower Box Carrée',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/box-fleurs-romantique-2.jpg`,
-                        name: 'Macarons et Fleurs',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/box-fleurs-romantique-3.jpg`,
-                        name: 'Écrin de Luxe',
-                    }
-                ]
-            },
-            {
-                title: 'Bouquet douceur rose rouge',
-                images: [
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-douceur-rose-rouge-1.jpg`,
-                        name: 'Nuage Pastel',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-douceur-rose-rouge-2.jpg`,
-                        name: 'Tendresse Infinie',
-                    },
-                    {
-                        url: `${import.meta.env.BASE_URL}images/gallery/bouquet-douceur-rose-rouge-3.jpg`,
-                        name: 'Charme Romantique',
-                    }
-                ]
-            }
-        ]
-    }
-];
+import { getProducts } from '../services/productService';
 
 const FloralGallery = () => {
-    // Indices state
-    const [activeTab, setActiveTab] = useState(0); // 0, 1, 2 (Categories)
-    const [subCatIndex, setSubCatIndex] = useState(0); // 0, 1, 2 (Sub-categories)
-    const [imgIndex, setImgIndex] = useState(0); // 0, 1, 2 (Images)
-    const [userInteracted, setUserInteracted] = useState(false); // To pause auto-scroll briefly on interaction
+    const navigate = useNavigate();
+    const [products, setProducts] = useState([]);
+    const [loading, setLoading] = useState(true);
 
-    // Derived current data
-    const currentCategory = categories[activeTab];
-    const currentSubCat = currentCategory.subCategories[subCatIndex];
-    const currentImage = currentSubCat.images[imgIndex];
-
-    // Reset logic when Category changes
     useEffect(() => {
-        setSubCatIndex(0);
-        setImgIndex(0);
-        setUserInteracted(false);
-    }, [activeTab]);
-
-    // Auto-scroll logic
-    useEffect(() => {
-        if (userInteracted) {
-            const timeout = setTimeout(() => setUserInteracted(false), 8000); // Pause for 8s after interaction
-            return () => clearTimeout(timeout);
-        }
-
-        const interval = setInterval(() => {
-            handleNextStep();
-        }, 5000);
-
-        return () => clearInterval(interval);
-    }, [activeTab, subCatIndex, imgIndex, userInteracted]);
-
-    const handleNextStep = () => {
-        // 1. Next Image
-        if (imgIndex < 2) {
-            setImgIndex(prev => prev + 1);
-        }
-        // 2. Next Sub-Category
-        else if (subCatIndex < 2) {
-            setSubCatIndex(prev => prev + 1);
-            setImgIndex(0);
-        }
-        // 3. Next Category
-        else {
-            setActiveTab(prev => (prev + 1) % categories.length);
-            // Effect above will reset subCat/img
-        }
-    };
-
-    const handlePrevSubCat = () => {
-        setUserInteracted(true);
-        if (subCatIndex > 0) {
-            setSubCatIndex(prev => prev - 1);
-        } else {
-            // Loop back to last sub-cat of current category or prev category?
-            // Spec says "respecter l’ordre logique", let's loop within category for simplicity on manual nav
-            setSubCatIndex(currentCategory.subCategories.length - 1);
-        }
-        setImgIndex(0);
-    };
-
-    const handleNextSubCat = () => {
-        setUserInteracted(true);
-        if (subCatIndex < currentCategory.subCategories.length - 1) {
-            setSubCatIndex(prev => prev + 1);
-        } else {
-            setSubCatIndex(0);
-        }
-        setImgIndex(0);
-    };
-
-    const handleImageSelect = (index) => {
-        setUserInteracted(true);
-        setImgIndex(index);
-    };
-
-    const handleCategorySelect = (index) => {
-        setUserInteracted(true);
-        setActiveTab(index);
-    };
-
-    const handleWhatsAppClick = () => {
-        const catName = currentCategory.label;
-        const subCatName = currentSubCat.title;
-        const imgName = currentImage.name;
-
-        const message = `Bonjour Maua’s House 🌸\nJe suis intéressé par la création :\n"${imgName}"\n(Catégorie : ${catName} – ${subCatName}).`;
-        const url = `https://wa.me/243907444762?text=${encodeURIComponent(message)}`;
-        window.open(url, '_blank');
-    };
+        const fetchGallery = async () => {
+            try {
+                const data = await getProducts();
+                // Get up to 4 latest products
+                if (data.length > 0) {
+                    setProducts(data.slice(0, 4));
+                }
+            } catch (error) {
+                console.error("Failed to load gallery:", error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchGallery();
+    }, []);
 
     return (
         <Section className="bg-maua-bg overflow-hidden relative" id="gallery">
@@ -282,138 +33,55 @@ const FloralGallery = () => {
                 <span className="text-maua-primary font-medium tracking-wide uppercase text-sm mb-2 block">
                     Portfolio
                 </span>
-                <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-maua-text mb-4">
-                    Nos Créations Florales
+                <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-maua-dark mb-4">
+                    Nos Dernières Créations
                 </h2>
-                <p className="text-stone-600 text-lg">
-                    Explorez nos univers, de la célébration à l'émotion.
+                <p className="text-stone-500 mb-8">
+                    Découvrez un aperçu de nos plus belles compositions.
                 </p>
+
+                <button
+                    onClick={() => navigate('/galerie')}
+                    className="inline-flex items-center gap-2 bg-maua-dark text-white px-8 py-3 rounded-full hover:bg-maua-primary transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
+                >
+                    VOIR TOUS LES BOUQUETS
+                    <ArrowRight size={18} />
+                </button>
             </div>
 
-            {/* --- Level 1: Category Tabs --- */}
-            <div className="flex flex-wrap justify-center gap-4 mb-10 px-4">
-                {categories.map((cat, index) => (
-                    <button
-                        key={cat.id}
-                        onClick={() => handleCategorySelect(index)}
-                        className={`flex items-center gap-2 px-6 py-3 rounded-full transition-all duration-300 text-sm font-medium border
-                            ${activeTab === index
-                                ? 'bg-maua-text text-white border-maua-text shadow-lg scale-105'
-                                : 'bg-white text-stone-600 border-stone-200 hover:bg-stone-50 hover:border-stone-300'
-                            }`}
-                    >
-                        <cat.icon size={16} />
-                        {cat.label}
-                    </button>
-                ))}
-            </div>
-
-            {/* --- Main Gallery Display --- */}
-            <div className="max-w-6xl mx-auto px-4">
-                <AnimatePresence mode="wait">
-                    <motion.div
-                        key={`${activeTab}-${subCatIndex}`} // Re-render animation when sub-cat changes
-                        initial={{ opacity: 0, y: 15 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: -15 }}
-                        transition={{ duration: 0.4 }}
-                        className="grid md:grid-cols-2 gap-4 md:gap-8 items-stretch bg-white rounded-3xl p-4 md:p-8 shadow-xl border border-stone-100 overflow-hidden"
-                    >
-                        {/* --- LEFT: Image Area --- */}
-                        <div className="relative flex flex-col gap-3 min-w-0">
-                            {/* Large Image */}
-                            <div className="relative aspect-[4/5] md:aspect-square w-full rounded-2xl overflow-hidden shadow-inner bg-stone-100">
-                                <AnimatePresence mode="wait">
-                                    <motion.img
-                                        key={currentImage.url}
-                                        src={currentImage.url}
-                                        alt={currentImage.name}
-                                        initial={{ opacity: 0, scale: 1.05 }}
-                                        animate={{ opacity: 1, scale: 1 }}
-                                        exit={{ opacity: 0 }}
-                                        transition={{ duration: 0.5 }}
-                                        className="absolute inset-0 w-full h-full object-cover"
-                                    />
-                                </AnimatePresence>
-
-                                {/* Navigation Arrows (Overlay) */}
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); handlePrevSubCat(); }}
-                                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-maua-text p-2 rounded-full shadow-md backdrop-blur-sm transition-all z-10"
-                                    aria-label="Sous-catégorie précédente"
-                                >
-                                    <ArrowLeft size={20} />
-                                </button>
-                                <button
-                                    onClick={(e) => { e.stopPropagation(); handleNextSubCat(); }}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 hover:bg-white text-maua-text p-2 rounded-full shadow-md backdrop-blur-sm transition-all z-10"
-                                    aria-label="Sous-catégorie suivante"
-                                >
-                                    <ArrowRight size={20} />
-                                </button>
-                            </div>
-
-                            {/* Thumbnails */}
-                            <div className="flex justify-center gap-3 mt-2">
-                                {currentSubCat.images.map((img, idx) => (
-                                    <button
-                                        key={idx}
-                                        onClick={() => handleImageSelect(idx)}
-                                        className={`relative w-16 h-16 sm:w-20 sm:h-20 rounded-lg overflow-hidden border-2 transition-all duration-300 flex-shrink-0
-                                            ${idx === imgIndex ? 'border-maua-primary ring-2 ring-pink-100 scale-105 opacity-100' : 'border-transparent opacity-60 hover:opacity-100'}`}
-                                    >
-                                        <img src={img.url} alt="" className="w-full h-full object-cover" />
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* --- RIGHT: Content Area --- */}
-                        <div className="flex flex-col justify-center space-y-4 md:space-y-8 md:pl-6 p-1 min-w-0">
-
-                            {/* Header Info */}
-                            <div>
-                                <div className="flex items-center gap-2 text-sm font-semibold tracking-wider text-stone-400 uppercase mb-2">
-                                    <span className={`w-2 h-2 rounded-full ${activeTab === 0 ? 'bg-pink-400' : activeTab === 1 ? 'bg-stone-400' : 'bg-red-400'}`}></span>
-                                    {currentCategory.label}
-                                </div>
-                                <h3 className="text-2xl sm:text-3xl md:text-4xl font-serif font-bold text-maua-text leading-tight break-words">
-                                    {currentSubCat.title}
-                                </h3>
-                            </div>
-
-                            {/* Active Image Details */}
+            {/* Gallery Grid Teaser */}
+            <div className="max-w-7xl mx-auto px-4">
+                {loading ? (
+                    <div className="flex justify-center items-center h-40">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-maua-primary"></div>
+                    </div>
+                ) : (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {products.map((product) => (
                             <motion.div
-                                key={imgIndex}
-                                initial={{ opacity: 0, x: 10 }}
-                                animate={{ opacity: 1, x: 0 }}
-                                transition={{ duration: 0.3 }}
-                                className="bg-stone-50 rounded-xl p-6 border border-stone-100"
+                                key={product.id}
+                                whileHover={{ y: -5 }}
+                                className="group relative aspect-[4/5] rounded-2xl overflow-hidden cursor-pointer shadow-md"
+                                onClick={() => navigate(`/galerie/${product.id}`)}
                             >
-                                <p className="text-xs text-stone-400 uppercase tracking-widest mb-1">Création sélectionnée</p>
-                                <p className="text-xl font-medium text-stone-700">
-                                    {currentImage.name}
-                                </p>
+                                <img
+                                    src={product.imageUrl}
+                                    alt={product.name}
+                                    className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                                />
+                                <div className="absolute inset-0 bg-black/20 group-hover:bg-black/40 transition-colors duration-300" />
+
+                                <div className="absolute inset-0 flex flex-col justify-end p-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                                    <h3 className="text-white font-serif font-bold text-lg">{product.name}</h3>
+                                    <p className="text-white/90 text-sm font-medium">{product.price} $</p>
+                                    <span className="absolute top-4 right-4 bg-white/20 backdrop-blur-sm p-2 rounded-full text-white">
+                                        <Eye size={16} />
+                                    </span>
+                                </div>
                             </motion.div>
-
-                            {/* Action Button */}
-                            <div>
-                                <button
-                                    onClick={handleWhatsAppClick}
-                                    className="w-full bg-maua-green hover:bg-emerald-800 text-white px-8 py-4 rounded-xl font-medium transition-all duration-300 transform hover:-translate-y-1 hover:shadow-lg flex items-center justify-center gap-3 group"
-                                >
-                                    <span>Intéressé</span>
-                                    <MessageCircle size={20} className="group-hover:rotate-12 transition-transform flex-shrink-0" />
-                                </button>
-                                <p className="text-center text-xs text-stone-400 mt-3 flex items-center justify-center gap-1">
-                                    <span className="w-1.5 h-1.5 rounded-full bg-green-500 animate-pulse"></span>
-                                    Réponse rapide via WhatsApp
-                                </p>
-                            </div>
-                        </div>
-
-                    </motion.div>
-                </AnimatePresence>
+                        ))}
+                    </div>
+                )}
             </div>
         </Section>
     );

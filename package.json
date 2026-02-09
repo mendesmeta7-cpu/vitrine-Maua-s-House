@@ -10,7 +10,7 @@
     "lint": "eslint .",
     "preview": "vite preview",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist"
+    "deploy": "cmd /c \"copy dist\\index.html dist\\404.html\" && gh-pages -d dist"
   },
   "dependencies": {
     "firebase": "^12.9.0",

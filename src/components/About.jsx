@@ -11,7 +11,7 @@ const About = () => {
                     <div className="aspect-[4/5] rounded-2xl overflow-hidden shadow-xl group relative">
                         <img
                             src={`${import.meta.env.BASE_URL}about-image.jpg`}
-                            alt="Maua's House - Chaque fleur raconte une histoire"
+                            alt="Maua's Flowers - Chaque fleur raconte une histoire"
                             className="object-cover w-full h-full transition-transform duration-700 group-hover:scale-105"
                         />
                         {/* Quote overlay - kept as per context, but styled to fit over the image */}
@@ -35,7 +35,7 @@ const About = () => {
                     </h2>
                     <div className="space-y-4 text-stone-600 text-lg leading-relaxed">
                         <p>
-                            Maua’s House est née d'une passion inconditionnelle pour la beauté naturelle des fleurs.
+                            Maua’s Flowers est née d'une passion inconditionnelle pour la beauté naturelle des fleurs.
                             Dans un monde qui va toujours plus vite, nous prenons le temps de sélectionner les tiges les plus parfaites
                             pour créer des compositions qui émeuvent.
                         </p>

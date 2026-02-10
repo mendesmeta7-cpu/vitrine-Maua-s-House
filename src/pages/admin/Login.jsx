@@ -30,7 +30,7 @@ const Login = () => {
                         <Lock className="w-6 h-6 text-maua-primary" />
                     </div>
                     <h1 className="text-2xl font-serif font-bold text-gray-800">Admin Login</h1>
-                    <p className="text-gray-500 text-sm">Maua's House Administration</p>
+                    <p className="text-gray-500 text-sm">Maua's Flowers Administration</p>
                 </div>
 
                 {error && <div className="bg-red-50 text-red-500 p-3 rounded-lg mb-4 text-sm text-center">{error}</div>}

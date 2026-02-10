@@ -3,7 +3,7 @@ const Footer = () => {
         <footer className="bg-stone-950 text-stone-500 py-8 border-t border-stone-800">
             <div className="max-w-6xl mx-auto px-6 flex flex-col md:flex-row justify-between items-center gap-4">
                 <p className="text-sm">
-                    &copy; {new Date().getFullYear()} Maua’s House. Tous droits réservés.
+                    &copy; {new Date().getFullYear()} Maua’s Flowers. Tous droits réservés.
                 </p>
                 <div className="flex gap-6 text-sm">
                     <a href="#" className="hover:text-stone-300 transition-colors">Mentions Légales</a>

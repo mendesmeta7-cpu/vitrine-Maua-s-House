@@ -21,7 +21,7 @@ const Hero = () => {
                         L’élégance naturelle à <br /> <span className="text-maua-primary italic">Kinshasa</span>
                     </h1>
                     <p className="text-lg md:text-xl text-stone-600 mb-10 max-w-2xl mx-auto leading-relaxed">
-                        Maua’s House est une maison florale dédiée à l’élégance naturelle.
+                        Maua’s Flowers est une maison florale dédiée à l’élégance naturelle.
                         Nous créons et sélectionnons des fleurs fraîches pour sublimer chaque moment important de votre vie.
                     </p>
 

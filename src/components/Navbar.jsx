@@ -28,7 +28,7 @@ const Navbar = () => {
             <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-2 group">
                     <span className={`text-xl font-serif font-bold tracking-tight text-maua-dark transition-colors`}>
-                        Maua’s House
+                        Maua’s Flowers
                     </span>
                 </Link>
 
@@ -96,8 +96,8 @@ const Navbar = () => {
                                     to={link.href}
                                     onClick={() => setMobileMenuOpen(false)}
                                     className={`text-lg font-medium py-3 block hover:text-maua-primary transition-colors ${location.pathname === link.href || (link.href !== '/' && location.pathname.startsWith(link.href))
-                                            ? 'text-maua-primary font-bold'
-                                            : 'text-maua-dark'
+                                        ? 'text-maua-primary font-bold'
+                                        : 'text-maua-dark'
                                         }`}
                                 >
                                     {link.name}

@@ -3,14 +3,11 @@
   "private": true,
   "version": "0.0.0",
   "type": "module",
-  "homepage": "https://mendesmeta7-cpu.github.io/vitrine-Maua-s-House",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview",
-    "predeploy": "npm run build",
-    "deploy": "cmd /c \"copy dist\\index.html dist\\404.html\" && gh-pages -d dist"
+    "preview": "vite preview"
   },
   "dependencies": {
     "firebase": "^12.9.0",

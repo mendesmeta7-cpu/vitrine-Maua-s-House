@@ -1,3 +1,4 @@
+// Production deployment trigger - Maua's Flowers
 import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import ProductPage from './pages/ProductPage';

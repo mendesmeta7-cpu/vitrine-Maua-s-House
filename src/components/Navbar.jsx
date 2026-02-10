@@ -27,6 +27,11 @@ const Navbar = () => {
         <nav className={`fixed top-0 w-full z-50 transition-all duration-300 ${scrolled || location.pathname !== '/' ? 'bg-white/90 backdrop-blur-md shadow-sm py-4' : 'bg-transparent py-6'}`}>
             <div className="max-w-6xl mx-auto px-6 flex justify-between items-center">
                 <Link to="/" className="flex items-center gap-2 group">
+                    <img
+                        src={`${import.meta.env.BASE_URL}logo.png`}
+                        alt="Maua's Flowers Logo"
+                        className="w-10 h-10 object-contain"
+                    />
                     <span className={`text-xl font-serif font-bold tracking-tight text-maua-dark transition-colors`}>
                         Maua’s Flowers
                     </span>

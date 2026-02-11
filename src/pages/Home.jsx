@@ -5,6 +5,7 @@ import Services from '../components/Services';
 import FloralGallery from '../components/FloralGallery';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
+import FloatingActionButton from '../components/FloatingActionButton';
 
 const Home = () => {
     return (
@@ -16,6 +17,7 @@ const Home = () => {
             <FloralGallery />
             <Contact />
             <Footer />
+            <FloatingActionButton />
         </div>
     );
 };

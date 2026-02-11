@@ -62,27 +62,7 @@ const Services = () => {
                     </div>
                 ))}
 
-                {/* Special Project CTA Card */}
-                <a
-                    href="https://wa.me/243907444762"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="group relative p-6 md:p-8 rounded-2xl bg-stone-950 text-white flex flex-col items-center justify-center text-center shadow-2xl hover:scale-[1.02] transition-transform duration-300 overflow-hidden"
-                >
-                    {/* Subtle decoration */}
-                    <div className="absolute top-0 right-0 w-32 h-32 bg-stone-800 rounded-full blur-3xl opacity-20 -mr-10 -mt-10" />
-
-                    <h3 className="text-2xl font-serif font-medium mb-3 relative z-10">
-                        Un projet spécial ?
-                    </h3>
-                    <p className="text-stone-400 mb-8 max-w-xs relative z-10">
-                        Discutons de votre vision florale.
-                    </p>
-
-                    <div className="w-12 h-12 bg-white text-black rounded-full flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
-                        <ArrowRight size={24} />
-                    </div>
-                </a>            </div>
+            </div>
         </Section>
     );
 };

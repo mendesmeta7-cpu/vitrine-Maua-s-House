@@ -11,6 +11,7 @@ export const createOrder = async (orderData) => {
             paymentStatus: 'pending',
             catalog_price: Number(orderData.productPrice), // Store catalog price for security check
             paid_amount: Number(orderData.productPrice), // Initially assume full amount is to be paid
+            paymentInfo: {}, // Initialize paymentInfo map
             createdAt: serverTimestamp()
         });
         return docRef.id;

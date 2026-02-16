@@ -56,7 +56,6 @@ export default async function handler(req, res) {
             depositId: depositId,
             amount: formattedAmount,
             currency: "CDF",
-            correspondent: operator, // VODACOM_MPESA_COD, AIRTEL_COD, ORANGE_COD
             payer: {
                 type: "MMO",
                 accountDetails: {

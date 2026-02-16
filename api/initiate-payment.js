@@ -64,9 +64,7 @@ export default async function handler(req, res) {
                     provider: operator
                 }
             },
-            statementDescription: "Fleurs Maua House",
-            returnUrl: "https://maua-s-house.vercel.app/galerie",
-            cancelUrl: "https://maua-s-house.vercel.app/galerie"
+            statementDescription: "Fleurs Maua House"
         };
 
         console.log("Initiating PawaPay deposit:", JSON.stringify(payload));

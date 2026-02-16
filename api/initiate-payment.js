@@ -47,16 +47,21 @@ export default async function handler(req, res) {
             status: 'pending_payment'
         });
 
+        const formattedPhoneNumber = phoneNumber.replace(/^\+/, '');
+        const formattedAmount = Math.floor(Number(amount)).toString();
+
         const payload = {
             depositId: depositId,
-            amount: amount.toString(),
+            amount: formattedAmount,
             currency: currency || "CDF",
             correspondent: operator, // VODACOM_MPESA_COD, AIRTEL_COD, ORANGE_COD
             payer: {
                 type: "MSISDN",
-                address: phoneNumber
+                address: formattedPhoneNumber
             },
-            statementDescription: `Order ${orderId}`
+            statementDescription: "Achat fleurs Maua",
+            returnUrl: "https://maua-s-house.vercel.app/galerie",
+            cancelUrl: "https://maua-s-house.vercel.app/galerie"
         };
 
         console.log("Initiating PawaPay deposit:", JSON.stringify(payload));

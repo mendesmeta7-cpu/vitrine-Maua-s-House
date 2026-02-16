@@ -58,8 +58,11 @@ export default async function handler(req, res) {
             currency: currency || "CDF",
             correspondent: operator, // VODACOM_MPESA_COD, AIRTEL_COD, ORANGE_COD
             payer: {
-                type: "MSISDN",
-                address: { value: cleanPhone }
+                type: "MMO",
+                accountDetails: {
+                    phoneNumber: cleanPhone,
+                    provider: operator
+                }
             },
             statementDescription: "Fleurs Maua House",
             returnUrl: "https://maua-s-house.vercel.app/galerie",

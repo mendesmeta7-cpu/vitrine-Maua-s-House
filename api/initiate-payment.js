@@ -1,5 +1,22 @@
 import { v4 as uuidv4 } from 'uuid';
-import { db } from './firebaseAdmin.js';
+import admin from 'firebase-admin';
+
+if (!admin.apps.length) {
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount)
+            });
+        } catch (e) {
+            console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT:", e);
+        }
+    } else {
+        console.error("FIREBASE_SERVICE_ACCOUNT is missing");
+    }
+}
+
+const db = admin.firestore();
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') {

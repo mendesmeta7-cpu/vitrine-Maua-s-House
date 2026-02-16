@@ -47,7 +47,9 @@ export default async function handler(req, res) {
             status: 'pending_payment'
         });
 
-        const formattedPhoneNumber = phoneNumber.replace(/^\+/, '');
+        // Force clean phone number (remove +, spaces, etc)
+        const cleanPhone = phoneNumber.replace(/\D/g, '');
+        // Force amount to string without decimals
         const formattedAmount = Math.floor(Number(amount)).toString();
 
         const payload = {
@@ -57,9 +59,9 @@ export default async function handler(req, res) {
             correspondent: operator, // VODACOM_MPESA_COD, AIRTEL_COD, ORANGE_COD
             payer: {
                 type: "MSISDN",
-                address: formattedPhoneNumber
+                address: { value: cleanPhone }
             },
-            statementDescription: "Achat fleurs Maua",
+            statementDescription: "Fleurs Maua House",
             returnUrl: "https://maua-s-house.vercel.app/galerie",
             cancelUrl: "https://maua-s-house.vercel.app/galerie"
         };

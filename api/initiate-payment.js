@@ -55,7 +55,7 @@ export default async function handler(req, res) {
         const payload = {
             depositId: depositId,
             amount: formattedAmount,
-            currency: currency || "CDF",
+            currency: "CDF",
             correspondent: operator, // VODACOM_MPESA_COD, AIRTEL_COD, ORANGE_COD
             payer: {
                 type: "MMO",
@@ -63,8 +63,7 @@ export default async function handler(req, res) {
                     phoneNumber: cleanPhone,
                     provider: operator
                 }
-            },
-            statementDescription: "Fleurs Maua House"
+            }
         };
 
         console.log("Initiating PawaPay deposit:", JSON.stringify(payload));

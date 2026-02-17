@@ -18,6 +18,10 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 export default async function handler(req, res) {
+    // Immediate logging for debugging
+    console.log("DONNEES RECUES:", JSON.stringify(req.body));
+    console.log("HEADERS:", JSON.stringify(req.headers));
+
     // Log the method for debugging
     console.log(`Webhook received with method: ${req.method}`);
 

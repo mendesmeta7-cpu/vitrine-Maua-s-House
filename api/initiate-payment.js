@@ -50,12 +50,19 @@ export default async function handler(req, res) {
         // Force clean phone number (remove +, spaces, etc)
         const cleanPhone = phoneNumber.replace(/\D/g, '');
         // Force amount to string without decimals
-        const formattedAmount = Math.floor(Number(amount)).toString();
+        // Force amount formatting based on currency
+        let formattedAmount;
+        if (currency === 'CDF') {
+            formattedAmount = Math.floor(Number(amount)).toString();
+        } else {
+            // For USD or others, allow 2 decimals
+            formattedAmount = Number(amount).toFixed(2);
+        }
 
         const payload = {
             depositId: depositId,
             amount: formattedAmount,
-            currency: "CDF",
+            currency: currency,
             payer: {
                 type: "MMO",
                 accountDetails: {

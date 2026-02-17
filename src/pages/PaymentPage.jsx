@@ -99,7 +99,7 @@ const PaymentPage = () => {
                 body: JSON.stringify({
                     orderId,
                     amount: order.paid_amount, // Ensure this matches backend expectation or is validated there
-                    currency: "CDF", // Assuming PawaPay uses CDF by default for DRC
+                    currency: order.currency || "CDF", // Use order currency (CDF or USD)
                     operator: operator,
                     phoneNumber: `+243${phoneNumber}`
                 })

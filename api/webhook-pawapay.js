@@ -18,7 +18,16 @@ if (!admin.apps.length) {
 const db = admin.firestore();
 
 export default async function handler(req, res) {
+    // Log the method for debugging
+    console.log(`Webhook received with method: ${req.method}`);
+
+    // Handle CORS preflight or PawaPay checks
+    if (req.method === 'OPTIONS') {
+        return res.status(200).end();
+    }
+
     if (req.method !== 'POST') {
+        console.error(`Method ${req.method} not allowed`);
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 

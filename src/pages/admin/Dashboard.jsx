@@ -400,8 +400,19 @@ const AdminDashboard = () => {
                                                             )}
                                                         </td>
                                                         <td className="px-6 py-4">
-                                                            <div className="font-medium text-gray-900">{order.productName}</div>
-                                                            <div className="text-xs text-gray-500">{new Date(order.createdAt?.seconds * 1000).toLocaleDateString()}</div>
+                                                            {order.items && order.items.length > 0 ? (
+                                                                <div className="space-y-1">
+                                                                    {order.items.map((item, idx) => (
+                                                                        <div key={idx} className="text-sm">
+                                                                            <span className="font-medium text-gray-900">{item.name}</span>
+                                                                            <span className="text-gray-500 text-xs ml-1">x{item.quantity}</span>
+                                                                        </div>
+                                                                    ))}
+                                                                </div>
+                                                            ) : (
+                                                                <div className="font-medium text-gray-900">{order.productName}</div>
+                                                            )}
+                                                            <div className="text-xs text-gray-500 mt-1">{new Date(order.createdAt?.seconds * 1000).toLocaleDateString()}</div>
                                                         </td>
                                                         <td className="px-6 py-4">
                                                             <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${isPriceValid ? "bg-green-50 border-green-200 text-green-700" : "bg-red-50 border-red-200 text-red-700"}`}>

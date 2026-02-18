@@ -2,6 +2,8 @@ import { createContext, useState, useEffect, useContext } from 'react';
 
 const CartContext = createContext();
 
+const MAX_CART_ITEMS = 20;
+
 export const useCart = () => useContext(CartContext);
 
 export const CartProvider = ({ children }) => {
@@ -37,6 +39,13 @@ export const CartProvider = ({ children }) => {
 
     const addToCart = (product, quantity = 1) => {
         setCartItems(prevItems => {
+            const currentTotalQuantity = prevItems.reduce((total, item) => total + item.quantity, 0);
+
+            if (currentTotalQuantity + quantity > MAX_CART_ITEMS) {
+                alert(`Le panier est plein (Limite : ${MAX_CART_ITEMS} articles). Impossible d'ajouter plus d'articles.`);
+                return prevItems;
+            }
+
             const existingItem = prevItems.find(item => item.id === product.id);
             if (existingItem) {
                 return prevItems.map(item =>
@@ -57,12 +66,25 @@ export const CartProvider = ({ children }) => {
         setCartItems([]);
     };
 
-    const updateQuantity = (productId, quantity) => {
-        setCartItems(prevItems =>
-            prevItems.map(item =>
-                item.id === productId ? { ...item, quantity: Math.max(1, quantity) } : item
-            )
-        );
+    const updateQuantity = (productId, newQuantity) => {
+        setCartItems(prevItems => {
+            if (newQuantity < 1) return prevItems; // Prevent going below 1 (handled by UI usually but good safety)
+
+            const itemToUpdate = prevItems.find(item => item.id === productId);
+            if (!itemToUpdate) return prevItems;
+
+            const quantityDifference = newQuantity - itemToUpdate.quantity;
+            const currentTotalQuantity = prevItems.reduce((total, item) => total + item.quantity, 0);
+
+            if (quantityDifference > 0 && (currentTotalQuantity + quantityDifference > MAX_CART_ITEMS)) {
+                alert(`Limite de ${MAX_CART_ITEMS} articles atteinte dans le panier.`);
+                return prevItems;
+            }
+
+            return prevItems.map(item =>
+                item.id === productId ? { ...item, quantity: newQuantity } : item
+            );
+        });
     };
 
     const cartTotal = cartItems.reduce((total, item) => total + (item.price * item.quantity), 0);

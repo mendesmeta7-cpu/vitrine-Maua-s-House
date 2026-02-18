@@ -11,7 +11,7 @@ import Footer from '../components/Footer';
 const FlowerDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
-    const { addToCart } = useCart();
+    const { addToCart, setCustomerInfo, customerInfo } = useCart();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -25,6 +25,12 @@ const FlowerDetail = () => {
     });
     const [submitting, setSubmitting] = useState(false);
     const [orderSuccess, setOrderSuccess] = useState(false);
+
+    useEffect(() => {
+        if (customerInfo) {
+            setFormData(prev => ({ ...prev, ...customerInfo }));
+        }
+    }, [customerInfo]);
 
     useEffect(() => {
         const fetchProduct = async () => {
@@ -68,6 +74,16 @@ const FlowerDetail = () => {
     };
 
     const handleAddToCart = () => {
+        // Validate form data
+        if (!formData.customerName || !formData.phone || !formData.address) {
+            alert("Veuillez remplir vos informations (Nom, Téléphone, Adresse) avant d'ajouter au panier.");
+            // Scroll to form
+            const formElement = document.getElementById('order-form');
+            if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
+            return;
+        }
+
+        setCustomerInfo(formData);
         addToCart({
             id: product.id,
             name: product.name,
@@ -77,6 +93,7 @@ const FlowerDetail = () => {
             quantity: 1
         });
         // Feedback is handled by Navbar cart badge, or we could add a toast here
+        alert("Produit ajouté au panier !");
     };
 
     if (loading) {
@@ -172,7 +189,7 @@ const FlowerDetail = () => {
                                 Commander directement
                             </h3>
 
-                            <form onSubmit={handleOrderSubmit} className="space-y-4">
+                            <form id="order-form" onSubmit={handleOrderSubmit} className="space-y-4">
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                     <div className="space-y-1">
                                         <label className="text-xs font-bold text-stone-500 uppercase">Votre nom</label>

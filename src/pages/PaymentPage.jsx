@@ -90,6 +90,14 @@ const PaymentPage = () => {
         setProcessing(true);
 
         try {
+            // Format amount based on currency
+            let amount = Number(order.paid_amount);
+            if (order.currency === 'USD') {
+                amount = Number(amount.toFixed(2));
+            } else {
+                amount = Math.round(amount);
+            }
+
             // Call our Vercel API function
             const response = await fetch('/api/initiate-payment', {
                 method: 'POST',
@@ -98,7 +106,7 @@ const PaymentPage = () => {
                 },
                 body: JSON.stringify({
                     orderId,
-                    amount: order.paid_amount, // Ensure this matches backend expectation or is validated there
+                    amount: amount,
                     currency: order.currency || "CDF", // Use order currency (CDF or USD)
                     operator: operator,
                     phoneNumber: `+243${phoneNumber}`
@@ -171,16 +179,38 @@ const PaymentPage = () => {
                             Récapitulatif
                         </h2>
 
-                        <div className="flex gap-4 mb-4">
-                            <img
-                                src={order.imageUrl || "/placeholder.jpg"}
-                                alt={order.productName}
-                                className="w-20 h-20 object-cover rounded-lg bg-stone-100"
-                            />
-                            <div>
-                                <h3 className="font-bold text-stone-800">{order.productName}</h3>
-                                <p className="text-maua-primary font-bold text-lg">{order.paid_amount} {order.currency || "CDF"}</p>
-                            </div>
+                        <div className="mb-4">
+                            {order.items && order.items.length > 0 ? (
+                                <div className="space-y-3">
+                                    {order.items.map((item, index) => (
+                                        <div key={index} className="flex gap-3 items-center">
+                                            <div className="w-12 h-12 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                                                <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                                            </div>
+                                            <div className="flex-1">
+                                                <p className="font-medium text-stone-800 text-sm">{item.name}</p>
+                                                <p className="text-stone-500 text-xs">{item.quantity} x {item.price} {order.currency}</p>
+                                            </div>
+                                        </div>
+                                    ))}
+                                    <div className="border-t pt-3 flex justify-between items-center mt-2">
+                                        <span className="font-bold text-stone-800">Total</span>
+                                        <span className="font-bold text-maua-primary text-lg">{order.paid_amount} {order.currency || "CDF"}</span>
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className="flex gap-4 mb-4">
+                                    <img
+                                        src={order.imageUrl || "/placeholder.jpg"}
+                                        alt={order.productName}
+                                        className="w-20 h-20 object-cover rounded-lg bg-stone-100"
+                                    />
+                                    <div>
+                                        <h3 className="font-bold text-stone-800">{order.productName}</h3>
+                                        <p className="text-maua-primary font-bold text-lg">{order.paid_amount} {order.currency || "CDF"}</p>
+                                    </div>
+                                </div>
+                            )}
                         </div>
 
                         <div className="space-y-2 text-sm text-stone-600 bg-stone-50 p-4 rounded-xl">

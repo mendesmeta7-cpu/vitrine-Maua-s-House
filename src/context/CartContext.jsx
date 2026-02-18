@@ -14,9 +14,26 @@ export const CartProvider = ({ children }) => {
         }
     });
 
+    const [customerInfo, setCustomerInfo] = useState(() => {
+        try {
+            const savedInfo = localStorage.getItem('customerInfo');
+            return savedInfo ? JSON.parse(savedInfo) : null;
+        } catch {
+            return null;
+        }
+    });
+
     useEffect(() => {
         localStorage.setItem('cart', JSON.stringify(cartItems));
     }, [cartItems]);
+
+    useEffect(() => {
+        if (customerInfo) {
+            localStorage.setItem('customerInfo', JSON.stringify(customerInfo));
+        } else {
+            localStorage.removeItem('customerInfo');
+        }
+    }, [customerInfo]);
 
     const addToCart = (product, quantity = 1) => {
         setCartItems(prevItems => {
@@ -57,7 +74,10 @@ export const CartProvider = ({ children }) => {
             removeFromCart,
             clearCart,
             updateQuantity,
-            cartTotal
+            updateQuantity,
+            cartTotal,
+            customerInfo,
+            setCustomerInfo
         }}>
             {children}
         </CartContext.Provider>

@@ -1,17 +1,52 @@
 import { useCart } from '../context/CartContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
-import { Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { Trash2, Plus, Minus, ArrowRight, CreditCard } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { createOrder } from '../services/orderService';
 
 const CartPage = () => {
-    const { cartItems, removeFromCart, updateQuantity, cartTotal } = useCart();
+    const { cartItems, removeFromCart, updateQuantity, cartTotal, customerInfo } = useCart();
+    const navigate = useNavigate();
 
-    const handleCheckout = () => {
-        // Placeholder for checkout logic (e.g., WhatsApp redirect or Payment Gateway)
-        const message = `Bonjour, je souhaite commander : \n${cartItems.map(item => `- ${item.name} (${item.quantity}x)`).join('\n')}\nTotal: ${cartTotal} ${cartItems[0]?.currency || '$'}`;
-        const whatsappUrl = `https://wa.me/243907444762?text=${encodeURIComponent(message)}`;
-        window.open(whatsappUrl, '_blank');
+    // Group items by currency
+    const usdItems = cartItems.filter(item => item.currency === 'USD');
+    const cdfItems = cartItems.filter(item => item.currency !== 'USD'); // Default to CDF or catch-all
+
+    const calculateTotal = (items) => items.reduce((total, item) => total + (item.price * item.quantity), 0);
+
+    const handlePayment = async (currency, items) => {
+        if (!customerInfo) {
+            alert("Informations client manquantes. Veuillez retourner à la boutique et remplir le formulaire sur un produit.");
+            return;
+        }
+
+        try {
+            const totalAmount = calculateTotal(items);
+            const orderData = {
+                ...customerInfo,
+                items: items.map(item => ({
+                    id: item.id,
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    imageUrl: item.imageUrl
+                })),
+                currency: currency,
+                productPrice: totalAmount, // Using productPrice to match existing schema for 'amount'
+                status: 'pending'
+            };
+
+            const orderId = await createOrder(orderData);
+
+            // Optimistically remove paid items from cart
+            items.forEach(item => removeFromCart(item.id));
+
+            navigate(`/payment/${orderId}`);
+        } catch (error) {
+            console.error("Payment initiation failed", error);
+            alert("Erreur lors de l'initialisation de la commande.");
+        }
     };
 
     return (
@@ -28,72 +63,31 @@ const CartPage = () => {
                         </Link>
                     </div>
                 ) : (
-                    <div className="grid md:grid-cols-3 gap-8">
-                        {/* Cart Items List */}
-                        <div className="md:col-span-2 space-y-4">
-                            {cartItems.map((item) => (
-                                <div key={item.id} className="bg-white p-4 rounded-xl shadow-sm flex items-center gap-4">
-                                    <div className="w-24 h-24 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
-                                        <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
-                                    </div>
-                                    <div className="flex-1">
-                                        <h3 className="font-serif text-lg text-maua-dark">{item.name}</h3>
-                                        <p className="text-maua-primary font-medium">{item.price} {item.currency || "$"}</p>
-                                    </div>
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex items-center border rounded-lg">
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity - 1)}
-                                                className="p-2 hover:bg-gray-50 text-gray-500"
-                                            >
-                                                <Minus className="w-4 h-4" />
-                                            </button>
-                                            <span className="w-8 text-center font-medium">{item.quantity}</span>
-                                            <button
-                                                onClick={() => updateQuantity(item.id, item.quantity + 1)}
-                                                className="p-2 hover:bg-gray-50 text-gray-500"
-                                            >
-                                                <Plus className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                        <button
-                                            onClick={() => removeFromCart(item.id)}
-                                            className="p-2 text-red-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
-                                        >
-                                            <Trash2 className="w-5 h-5" />
-                                        </button>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
 
-                        {/* Order Summary */}
-                        <div className="md:col-span-1">
-                            <div className="bg-white p-6 rounded-xl shadow-sm sticky top-24">
-                                <h2 className="font-serif text-xl text-maua-dark mb-4">Résumé de la commande</h2>
-                                <div className="space-y-3 mb-6 border-b pb-6">
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Sous-total</span>
-                                        <span>{cartTotal} {cartItems[0]?.currency || "$"}</span>
-                                    </div>
-                                    <div className="flex justify-between text-gray-600">
-                                        <span>Livraison</span>
-                                        <span className="text-sm text-gray-400">(Calculé ensuite)</span>
-                                    </div>
-                                </div>
-                                <div className="flex justify-between text-xl font-medium text-maua-dark mb-6">
-                                    <span>Total</span>
-                                    <span>{cartTotal} {cartItems[0]?.currency || "$"}</span>
-                                </div>
-                                <button
-                                    onClick={handleCheckout}
-                                    className="w-full bg-maua-primary text-white py-3 rounded-xl font-medium hover:bg-maua-primary-dark transition-colors flex items-center justify-center gap-2"
-                                >
-                                    Commander via WhatsApp
-                                    <ArrowRight className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
+                    <div className="space-y-12">
+                        {/* USD Section */}
+                        {usdItems.length > 0 && (
+                            <CartSection
+                                currency="USD"
+                                items={usdItems}
+                                total={calculateTotal(usdItems)}
+                                onUpdateQuantity={updateQuantity}
+                                onRemove={removeFromCart}
+                                onPay={() => handlePayment('USD', usdItems)}
+                            />
+                        )}
+
+                        {/* CDF Section */}
+                        {cdfItems.length > 0 && (
+                            <CartSection
+                                currency="CDF"
+                                items={cdfItems}
+                                total={calculateTotal(cdfItems)}
+                                onUpdateQuantity={updateQuantity}
+                                onRemove={removeFromCart}
+                                onPay={() => handlePayment('CDF', cdfItems)}
+                            />
+                        )}
                     </div>
                 )}
             </div>
@@ -101,5 +95,73 @@ const CartPage = () => {
         </div>
     );
 };
+
+const CartSection = ({ currency, items, total, onUpdateQuantity, onRemove, onPay }) => (
+    <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+        <h2 className="text-2xl font-serif text-maua-dark mb-6 flex items-center gap-2 border-b pb-4">
+            <span className="bg-maua-primary/10 text-maua-primary px-3 py-1 rounded-lg text-sm font-bold">
+                {currency}
+            </span>
+            Panier {currency}
+        </h2>
+
+        <div className="grid md:grid-cols-3 gap-8">
+            <div className="md:col-span-2 space-y-4">
+                {items.map((item) => (
+                    <div key={item.id} className="flex gap-4 py-4 border-b last:border-0 border-stone-50">
+                        <div className="w-20 h-20 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
+                            <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
+                        </div>
+                        <div className="flex-1">
+                            <h3 className="font-serif text-lg text-maua-dark">{item.name}</h3>
+                            <p className="text-maua-primary font-medium">{item.price} {currency}</p>
+
+                            <div className="flex items-center gap-4 mt-2">
+                                <div className="flex items-center border rounded-lg bg-stone-50">
+                                    <button
+                                        onClick={() => onUpdateQuantity(item.id, item.quantity - 1)}
+                                        className="p-1 hover:bg-gray-200 text-gray-500 rounded-l-lg transition-colors"
+                                    >
+                                        <Minus className="w-4 h-4" />
+                                    </button>
+                                    <span className="w-8 text-center font-medium text-sm">{item.quantity}</span>
+                                    <button
+                                        onClick={() => onUpdateQuantity(item.id, item.quantity + 1)}
+                                        className="p-1 hover:bg-gray-200 text-gray-500 rounded-r-lg transition-colors"
+                                    >
+                                        <Plus className="w-4 h-4" />
+                                    </button>
+                                </div>
+                                <button
+                                    onClick={() => onRemove(item.id)}
+                                    className="text-red-400 hover:text-red-500 text-sm flex items-center gap-1 transition-colors"
+                                >
+                                    <Trash2 className="w-4 h-4" />
+                                    <span className="hidden sm:inline">Retirer</span>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="md:col-span-1">
+                <div className="bg-stone-50 p-6 rounded-xl">
+                    <div className="flex justify-between text-lg font-medium text-maua-dark mb-6">
+                        <span>Total ({currency})</span>
+                        <span className="text-xl font-bold">{total} {currency}</span>
+                    </div>
+                    <button
+                        onClick={onPay}
+                        className="w-full bg-maua-primary text-white py-3 rounded-xl font-medium hover:bg-maua-primary-dark transition-colors flex items-center justify-center gap-2 shadow-lg shadow-maua-primary/20"
+                    >
+                        Payer {total} {currency}
+                        <ArrowRight className="w-5 h-5" />
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+);
 
 export default CartPage;

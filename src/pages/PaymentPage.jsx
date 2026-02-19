@@ -8,6 +8,29 @@ import { db } from '../firebase';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
+const OPERATOR_LOGOS = {
+    VODACOM_MPESA_COD: (
+        <svg viewBox="0 0 100 40" className="h-8 w-auto">
+            <path d="M10 10h12l4 12 4-12h12v20h-8v-12l-4 8-4-8v12H10V10z" fill="#E11D48" />
+            <path d="M45 20h30" stroke="#000" strokeWidth="2" />
+            <text x="45" y="27" fontSize="12" fontWeight="bold" fontFamily="sans-serif">M-PESA</text>
+        </svg>
+    ),
+    AIRTEL_COD: (
+        <svg viewBox="0 0 100 40" className="h-8 w-auto">
+            <path d="M20 30c-5.5 0-10-4.5-10-10s4.5-10 10-10 10 4.5 10 10-4.5 10-10 10zm0-16c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6z" fill="#FF0000" />
+            <path d="M35 15v15h4v-15h-4zM45 20c0-2.8 2.2-5 5-5s5 2.2 5 5-2.2 5-5 5-5-2.2-5-5zm5-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#FF0000" />
+            <text x="60" y="27" fontSize="14" fontWeight="bold" fill="#FF0000" fontFamily="sans-serif">airtel</text>
+        </svg>
+    ),
+    ORANGE_COD: (
+        <svg viewBox="0 0 50 50" className="h-8 w-auto">
+            <rect width="50" height="50" fill="#FF7900" />
+            <text x="5" y="40" fill="white" fontSize="10" fontWeight="bold" fontFamily="sans-serif">orange</text>
+        </svg>
+    )
+};
+
 const PaymentPage = () => {
     const { orderId } = useParams();
     const navigate = useNavigate();
@@ -306,18 +329,20 @@ const PaymentPage = () => {
                                 <form onSubmit={handleMobileMoneyPayment} className="space-y-4">
                                     <div>
                                         <label className="block text-sm font-medium text-stone-700 mb-2">Opérateur</label>
-                                        <div className="grid grid-cols-3 gap-2">
-                                            {['VODACOM_MPESA_COD', 'AIRTEL_COD', 'ORANGE_COD'].map((op) => (
+                                        <div className="grid grid-cols-3 gap-3">
+                                            {Object.keys(OPERATOR_LOGOS).map((op) => (
                                                 <button
                                                     key={op}
                                                     type="button"
                                                     onClick={() => setOperator(op)}
-                                                    className={`p-3 rounded-xl border text-sm font-bold transition-all ${operator === op
-                                                        ? 'border-maua-primary bg-maua-primary/10 text-maua-primary'
-                                                        : 'border-stone-200 text-stone-500 hover:border-stone-300'
+                                                    className={`h-20 flex items-center justify-center rounded-2xl border transition-all p-2 ${operator === op
+                                                        ? 'border-maua-primary bg-maua-primary/5 ring-1 ring-maua-primary shadow-sm'
+                                                        : 'border-stone-100 hover:border-stone-300'
                                                         }`}
                                                 >
-                                                    {op.split('_')[0]}
+                                                    <div className="flex h-full w-full items-center justify-center pointer-events-none">
+                                                        {OPERATOR_LOGOS[op]}
+                                                    </div>
                                                 </button>
                                             ))}
                                         </div>

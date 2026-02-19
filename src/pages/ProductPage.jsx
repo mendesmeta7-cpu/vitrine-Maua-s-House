@@ -35,7 +35,7 @@ const ProductPage = () => {
     return (
         <div className="bg-maua-bg min-h-screen font-sans">
             <Navbar />
-            <div className="pt-24 pb-12 px-6 max-w-7xl mx-auto">
+            <div className="pt-24 pb-12 px-4 sm:px-6 max-w-7xl mx-auto">
                 <button
                     onClick={() => navigate(-1)}
                     className="flex items-center text-maua-dark mb-8 hover:text-maua-primary transition-colors"
@@ -44,7 +44,7 @@ const ProductPage = () => {
                     Retour à la galerie
                 </button>
 
-                <div className="grid md:grid-cols-2 gap-12 bg-white p-8 rounded-2xl shadow-sm">
+                <div className="grid md:grid-cols-2 gap-8 md:gap-12 bg-white p-4 sm:p-8 rounded-2xl shadow-sm">
                     {/* Image */}
                     <div className="rounded-xl overflow-hidden bg-gray-100 aspect-square">
                         <img

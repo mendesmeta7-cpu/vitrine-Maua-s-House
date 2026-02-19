@@ -11,6 +11,11 @@ html {
 @layer base {
   body {
     @apply bg-maua-bg text-maua-text font-sans antialiased;
+    overflow-x: hidden;
+  }
+  img {
+    max-width: 100%;
+    height: auto;
   }
   h1, h2, h3, h4, h5, h6 {
     @apply font-serif;

@@ -52,7 +52,7 @@ const CartPage = () => {
     return (
         <div className="bg-maua-bg min-h-screen font-sans">
             <Navbar />
-            <div className="pt-24 pb-12 px-6 max-w-5xl mx-auto">
+            <div className="pt-24 pb-12 px-4 sm:px-6 max-w-5xl mx-auto">
                 <h1 className="text-4xl font-serif text-maua-dark mb-8 text-center">Votre Panier</h1>
 
                 {cartItems.length === 0 ? (
@@ -97,7 +97,7 @@ const CartPage = () => {
 };
 
 const CartSection = ({ currency, items, total, onUpdateQuantity, onRemove, onPay }) => (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-stone-100">
+    <div className="bg-white p-4 sm:p-6 rounded-2xl shadow-sm border border-stone-100">
         <h2 className="text-2xl font-serif text-maua-dark mb-6 flex items-center gap-2 border-b pb-4">
             <span className="bg-maua-primary/10 text-maua-primary px-3 py-1 rounded-lg text-sm font-bold">
                 {currency}

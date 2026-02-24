@@ -10,23 +10,24 @@ import Footer from '../components/Footer';
 
 const OPERATOR_LOGOS = {
     VODACOM_MPESA_COD: (
-        <svg viewBox="0 0 100 40" className="h-8 w-auto">
-            <path d="M10 10h12l4 12 4-12h12v20h-8v-12l-4 8-4-8v12H10V10z" fill="#E11D48" />
-            <path d="M45 20h30" stroke="#000" strokeWidth="2" />
-            <text x="45" y="27" fontSize="12" fontWeight="bold" fontFamily="sans-serif">M-PESA</text>
+        <svg viewBox="0 10 135 40" className="h-8 md:h-10 w-auto drop-shadow-sm">
+            <text x="0" y="38" fill="#4BAA42" fontSize="28" fontWeight="900" fontFamily="Arial, Helvetica, sans-serif" letterSpacing="-1">
+                <tspan fill="#E60000">M</tspan>-PESA
+            </text>
+            <path d="M0 46 h130" stroke="#4BAA42" strokeWidth="4" />
         </svg>
     ),
     AIRTEL_COD: (
-        <svg viewBox="0 0 100 40" className="h-8 w-auto">
-            <path d="M20 30c-5.5 0-10-4.5-10-10s4.5-10 10-10 10 4.5 10 10-4.5 10-10 10zm0-16c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6z" fill="#FF0000" />
-            <path d="M35 15v15h4v-15h-4zM45 20c0-2.8 2.2-5 5-5s5 2.2 5 5-2.2 5-5 5-5-2.2-5-5zm5-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#FF0000" />
-            <text x="60" y="27" fontSize="14" fontWeight="bold" fill="#FF0000" fontFamily="sans-serif">airtel</text>
+        <svg viewBox="20 5 105 32" className="h-8 md:h-10 w-auto drop-shadow-sm">
+            <path d="M35 30c-5.5 0-10-4.5-10-10s4.5-10 10-10 10 4.5 10 10-4.5 10-10 10zm0-16c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6z" fill="#FF0000" />
+            <path d="M50 15v15h4v-15h-4zM60 20c0-2.8 2.2-5 5-5s5 2.2 5 5-2.2 5-5 5-5-2.2-5-5zm5-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#FF0000" />
+            <text x="73" y="27" fontSize="18" fontWeight="bold" fill="#FF0000" fontFamily="Arial, Helvetica, sans-serif" letterSpacing="-0.5">airtel</text>
         </svg>
     ),
     ORANGE_COD: (
-        <svg viewBox="0 0 50 50" className="h-8 w-auto">
-            <rect width="50" height="50" fill="#FF7900" />
-            <text x="5" y="40" fill="white" fontSize="10" fontWeight="bold" fontFamily="sans-serif">orange</text>
+        <svg viewBox="0 0 100 100" className="h-8 md:h-10 w-auto rounded shadow-sm">
+            <rect width="100" height="100" fill="#F16E00" />
+            <text x="50" y="86" fill="white" fontSize="22" fontWeight="bold" fontFamily="Helvetica, Arial, sans-serif" textAnchor="middle" letterSpacing="-0.5">orange</text>
         </svg>
     )
 };

@@ -74,7 +74,9 @@ export default async function handler(req, res) {
 
         console.log("Initiating PawaPay deposit:", JSON.stringify(payload));
 
-        const response = await fetch('https://api.sandbox.pawapay.io/v2/deposits', {
+        const fullUrl = `${process.env.PAWAPAY_API_URL}/v2/deposits`;
+
+        const response = await fetch(fullUrl, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

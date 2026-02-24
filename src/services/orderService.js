@@ -5,13 +5,21 @@ const ORDERS_COLLECTION = "orders";
 
 export const createOrder = async (orderData) => {
     try {
+        // Ensure productPrice is a valid number to prevent Firestore NaN errors
+        let validPrice = 0;
+        if (orderData.productPrice !== undefined && orderData.productPrice !== null) {
+            const priceStr = String(orderData.productPrice).replace(/,/g, '.').replace(/[^0-9.-]+/g, "");
+            validPrice = parseFloat(priceStr);
+            if (isNaN(validPrice)) validPrice = 0;
+        }
+
         const docRef = await addDoc(collection(db, ORDERS_COLLECTION), {
             ...orderData,
-            status: 'pending', // Changing initial status to pending as requested
+            status: 'pending',
             paymentStatus: 'pending',
-            catalog_price: Number(orderData.productPrice), // Store catalog price for security check
-            paid_amount: Number(orderData.productPrice), // Initially assume full amount is to be paid
-            paymentInfo: {}, // Initialize paymentInfo map
+            catalog_price: validPrice,
+            paid_amount: validPrice,
+            paymentInfo: {},
             createdAt: serverTimestamp()
         });
         return docRef.id;

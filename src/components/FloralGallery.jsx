@@ -30,9 +30,7 @@ const FloralGallery = () => {
     return (
         <Section className="bg-maua-bg overflow-hidden relative" id="gallery">
             <div className="text-center max-w-2xl mx-auto mb-12">
-                <span className="text-maua-primary font-medium tracking-wide uppercase text-sm mb-2 block">
-                    Portfolio
-                </span>
+
                 <h2 className="text-3xl sm:text-4xl md:text-5xl font-serif font-bold text-maua-dark mb-4">
                     Nos Dernières Créations
                 </h2>
@@ -44,7 +42,7 @@ const FloralGallery = () => {
                     onClick={() => navigate('/galerie')}
                     className="inline-flex items-center gap-2 bg-maua-dark text-white px-8 py-3 rounded-full hover:bg-maua-primary transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-1"
                 >
-                    VOIR TOUS LES BOUQUETS
+                    VOIR TOUTES LES COMPOSITIONS
                     <ArrowRight size={18} />
                 </button>
             </div>

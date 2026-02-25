@@ -32,12 +32,13 @@ const AdminDashboard = () => {
     const [formData, setFormData] = useState({
         name: "",
         price: "",
-        currency: "USD", // Default currency
+        currency: "USD",
         category: "innovations",
         description: "",
         imageFile: null,
         imageUrl: "",
-        imagePublicId: ""
+        imagePublicId: "",
+        variants: []
     });
     const [formLoading, setFormLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState(""); // Feedback for user
@@ -121,7 +122,7 @@ const AdminDashboard = () => {
     // Modal Handlers
     const openAddModal = () => {
         setEditingProduct(null);
-        setFormData({ name: "", price: "", currency: "USD", category: "innovations", description: "", imageFile: null, imageUrl: "", imagePublicId: "" });
+        setFormData({ name: "", price: "", currency: "USD", category: "innovations", description: "", imageFile: null, imageUrl: "", imagePublicId: "", variants: [] });
         setLoadingStatus("");
         setIsModalOpen(true);
     };
@@ -136,13 +137,39 @@ const AdminDashboard = () => {
             description: product.description || "",
             imageUrl: product.imageUrl || "",
             imagePublicId: product.imagePublicId || "",
-            imageFile: null
+            imageFile: null,
+            variants: product.variants || []
         });
         setLoadingStatus("");
         setIsModalOpen(true);
     };
 
     const closeModal = () => setIsModalOpen(false);
+
+    // Variant Handlers
+    const handleAddVariant = () => {
+        if (formData.variants.length < 4) {
+            setFormData(prev => ({
+                ...prev,
+                variants: [...(prev.variants || []), { id: Date.now().toString(), name: "", price: "", imageFile: null, imageUrl: "", imagePublicId: "" }]
+            }));
+        }
+    };
+
+    const handleRemoveVariant = (indexToRemove) => {
+        setFormData(prev => ({
+            ...prev,
+            variants: prev.variants.filter((_, idx) => idx !== indexToRemove)
+        }));
+    };
+
+    const handleVariantChange = (index, field, value) => {
+        setFormData(prev => {
+            const newVariants = [...prev.variants];
+            newVariants[index] = { ...newVariants[index], [field]: value };
+            return { ...prev, variants: newVariants };
+        });
+    };
 
     // CRUD Handlers
     const handleSubmit = async (e) => {
@@ -171,25 +198,78 @@ const AdminDashboard = () => {
             let finalImageUrl = formData.imageUrl;
             let finalImagePublicId = formData.imagePublicId;
 
-            // 2. Image Upload
+            // 2. Image Upload Main
             if (formData.imageFile) {
-                setLoadingStatus("Envoi de l'image en cours...");
+                setLoadingStatus("Envoi de l'image principale en cours...");
                 try {
                     const uploadResult = await uploadImage(formData.imageFile);
                     finalImageUrl = uploadResult.url;
                     finalImagePublicId = uploadResult.publicId;
 
                     if (editingProduct && editingProduct.imagePublicId && editingProduct.imagePublicId !== finalImagePublicId) {
-                        setLoadingStatus("Suppression de l'ancienne image...");
+                        setLoadingStatus("Suppression de l'ancienne image principale...");
                         await fetch('/api/delete-image', {
                             method: 'POST',
                             headers: { 'Content-Type': 'application/json' },
                             body: JSON.stringify({ public_id: editingProduct.imagePublicId })
-                        }).catch(err => console.error("Erreur suppression ancienne image:", err));
+                        }).catch(err => console.error("Erreur suppression ancienne image principale:", err));
                     }
                 } catch (uploadError) {
                     console.error("Upload failed", uploadError);
-                    throw new Error("Échec de l'envoi de l'image. Vérifiez votre connexion.");
+                    throw new Error("Échec de l'envoi de l'image principale. Vérifiez votre connexion.");
+                }
+            }
+
+            // 2.5 Image Upload Variants
+            const processedVariants = [];
+            let variantIndex = 1;
+            for (const variant of formData.variants || []) {
+                let vImageUrl = variant.imageUrl || "";
+                let vImagePublicId = variant.imagePublicId || "";
+
+                if (variant.imageFile) {
+                    setLoadingStatus(`Envoi de l'image variante ${variantIndex}...`);
+                    try {
+                        const uploadResult = await uploadImage(variant.imageFile);
+                        vImageUrl = uploadResult.url;
+                        vImagePublicId = uploadResult.publicId;
+
+                        const oldVariant = editingProduct?.variants?.find(v => v.id === variant.id);
+                        if (oldVariant && oldVariant.imagePublicId && oldVariant.imagePublicId !== vImagePublicId) {
+                            setLoadingStatus("Suppression ancienne image variante...");
+                            await fetch('/api/delete-image', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ public_id: oldVariant.imagePublicId })
+                            }).catch(err => console.error("Erreur suppression ancienne image variante:", err));
+                        }
+                    } catch (uploadError) {
+                        console.error("Upload failed for variant", uploadError);
+                        throw new Error(`Échec de l'envoi de l'image de la variante ${variantIndex}.`);
+                    }
+                }
+
+                processedVariants.push({
+                    id: variant.id || Date.now() + Math.random().toString(36).substring(7),
+                    name: variant.name,
+                    price: Number(variant.price),
+                    imageUrl: vImageUrl,
+                    imagePublicId: vImagePublicId || null
+                });
+                variantIndex++;
+            }
+
+            // Cleanup removed variants' images
+            if (editingProduct && editingProduct.variants) {
+                const currentVariantIds = processedVariants.map(v => v.id);
+                for (const oldVariant of editingProduct.variants) {
+                    if (!currentVariantIds.includes(oldVariant.id) && oldVariant.imagePublicId) {
+                        fetch('/api/delete-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ public_id: oldVariant.imagePublicId })
+                        }).catch(err => console.error("Erreur suppression image ancienne variante retirée:", err));
+                    }
                 }
             }
 
@@ -204,6 +284,7 @@ const AdminDashboard = () => {
                 description: formData.description,
                 imageUrl: finalImageUrl,
                 imagePublicId: finalImagePublicId || null,
+                variants: processedVariants,
                 updatedAt: new Date()
             };
 
@@ -234,12 +315,25 @@ const AdminDashboard = () => {
         if (window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {
             try {
                 const productToDelete = products.find(p => p.id === id);
-                if (productToDelete && productToDelete.imagePublicId) {
-                    await fetch('/api/delete-image', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ public_id: productToDelete.imagePublicId })
-                    }).catch(err => console.error("Erreur suppression image Cloudinary:", err));
+                if (productToDelete) {
+                    if (productToDelete.imagePublicId) {
+                        await fetch('/api/delete-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ public_id: productToDelete.imagePublicId })
+                        }).catch(err => console.error("Erreur suppression image Cloudinary:", err));
+                    }
+                    if (productToDelete.variants) {
+                        for (const v of productToDelete.variants) {
+                            if (v.imagePublicId) {
+                                await fetch('/api/delete-image', {
+                                    method: 'POST',
+                                    headers: { 'Content-Type': 'application/json' },
+                                    body: JSON.stringify({ public_id: v.imagePublicId })
+                                }).catch(err => console.error("Erreur suppression image variante Cloudinary:", err));
+                            }
+                        }
+                    }
                 }
                 await deleteProduct(id);
                 loadProducts();
@@ -594,6 +688,84 @@ const AdminDashboard = () => {
                                         className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-maua-primary outline-none"
                                         placeholder="Description détaillée du produit..."
                                     ></textarea>
+                                </div>
+
+                                {/* Variants Section */}
+                                <div className="pt-4 border-t border-gray-100">
+                                    <div className="flex justify-between items-center mb-4">
+                                        <label className="block text-sm font-bold text-gray-800">Variantes du produit ({formData.variants?.length || 0}/4)</label>
+                                        <button
+                                            type="button"
+                                            onClick={handleAddVariant}
+                                            disabled={(formData.variants?.length || 0) >= 4}
+                                            className="text-sm bg-stone-100 hover:bg-stone-200 text-stone-700 font-medium px-3 py-1 rounded-lg transition-colors flex items-center gap-1 disabled:opacity-50"
+                                        >
+                                            <Plus size={16} /> Ajouter une variante
+                                        </button>
+                                    </div>
+                                    <div className="space-y-4">
+                                        {formData.variants?.map((variant, index) => (
+                                            <div key={variant.id || index} className="p-4 border border-stone-200 rounded-xl bg-stone-50 relative grid grid-cols-1 md:grid-cols-12 gap-4 items-start">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => handleRemoveVariant(index)}
+                                                    className="absolute -top-2 -right-2 bg-red-100 text-red-600 rounded-full p-1 border border-red-200 hover:bg-red-200"
+                                                >
+                                                    <X size={14} />
+                                                </button>
+
+                                                <div className="md:col-span-4">
+                                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Nom (ex: Grand Bouquet)</label>
+                                                    <input
+                                                        type="text"
+                                                        required
+                                                        value={variant.name}
+                                                        onChange={(e) => handleVariantChange(index, "name", e.target.value)}
+                                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-maua-primary outline-none"
+                                                    />
+                                                </div>
+                                                <div className="md:col-span-3">
+                                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Prix ({formData.currency})</label>
+                                                    <input
+                                                        type="number"
+                                                        required
+                                                        min="0"
+                                                        step="0.01"
+                                                        value={variant.price}
+                                                        onChange={(e) => handleVariantChange(index, "price", e.target.value)}
+                                                        className="w-full px-3 py-2 text-sm border border-gray-300 rounded-lg focus:ring-2 focus:ring-maua-primary outline-none"
+                                                    />
+                                                </div>
+                                                <div className="md:col-span-5">
+                                                    <label className="block text-xs font-semibold text-gray-600 mb-1">Image spécifique (optionnelle)</label>
+                                                    <div className="flex items-center gap-2">
+                                                        <div className="flex-1 border border-dashed border-gray-300 rounded-lg p-2 flex items-center justify-center text-center h-12 hover:bg-gray-100 transition-colors relative cursor-pointer bg-white">
+                                                            <input
+                                                                type="file"
+                                                                accept="image/*"
+                                                                onChange={(e) => {
+                                                                    if (e.target.files[0]) {
+                                                                        handleVariantChange(index, "imageFile", e.target.files[0]);
+                                                                    }
+                                                                }}
+                                                                className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                                                            />
+                                                            <span className="text-xs text-gray-500 font-medium">+ Uploader</span>
+                                                        </div>
+                                                        {(variant.imageFile || variant.imageUrl) && (
+                                                            <div className="h-12 w-12 rounded bg-white shadow-sm border border-gray-200 overflow-hidden flex-shrink-0">
+                                                                <img
+                                                                    src={variant.imageFile ? URL.createObjectURL(variant.imageFile) : variant.imageUrl}
+                                                                    alt="Preview"
+                                                                    className="w-full h-full object-cover"
+                                                                />
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
                                 </div>
 
                                 <div className="pt-4 border-t border-gray-100 flex justify-end gap-3">

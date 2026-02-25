@@ -15,6 +15,7 @@ const FlowerDetail = () => {
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
+    const [selectedVariant, setSelectedVariant] = useState(null);
 
     // Order Form State
     const [formData, setFormData] = useState({
@@ -37,6 +38,11 @@ const FlowerDetail = () => {
             try {
                 const data = await getProductById(id);
                 setProduct(data);
+                if (data?.variants?.length > 0) {
+                    setSelectedVariant(data.variants[0]);
+                } else {
+                    setSelectedVariant(null);
+                }
             } catch (err) {
                 console.error("Error fetching product:", err);
                 setError("Produit introuvable ou erreur de chargement.");
@@ -56,12 +62,16 @@ const FlowerDetail = () => {
         e.preventDefault();
         setSubmitting(true);
         try {
+            const finalName = selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name;
+            const finalPrice = selectedVariant ? selectedVariant.price : product.price;
+            const finalImage = (selectedVariant && selectedVariant.imageUrl) ? selectedVariant.imageUrl : product.imageUrl;
+
             const orderId = await createOrder({
                 productId: product.id,
-                productName: product.name,
-                productPrice: product.price,
+                productName: finalName,
+                productPrice: finalPrice,
                 currency: product.currency || 'USD',
-                imageUrl: product.imageUrl,
+                imageUrl: finalImage,
                 ...formData
             });
             // Redirect to Payment Page
@@ -83,13 +93,17 @@ const FlowerDetail = () => {
             return;
         }
 
+        const finalName = selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name;
+        const finalPrice = selectedVariant ? selectedVariant.price : product.price;
+        const finalImage = (selectedVariant && selectedVariant.imageUrl) ? selectedVariant.imageUrl : product.imageUrl;
+
         setCustomerInfo(formData);
         addToCart({
-            id: product.id,
-            name: product.name,
-            price: product.price,
+            id: selectedVariant ? `${product.id}-${selectedVariant.id}` : product.id,
+            name: finalName,
+            price: finalPrice,
             currency: product.currency || "USD",
-            imageUrl: product.imageUrl,
+            imageUrl: finalImage,
             quantity: 1
         });
         // Feedback is handled by Navbar cart badge, or we could add a toast here
@@ -120,6 +134,9 @@ const FlowerDetail = () => {
         );
     }
 
+    const displayPrice = selectedVariant ? selectedVariant.price : product.price;
+    const displayImage = (selectedVariant && selectedVariant.imageUrl) ? selectedVariant.imageUrl : product.imageUrl;
+
     return (
         <div className="bg-maua-bg min-h-screen font-sans selection:bg-maua-primary selection:text-white">
             <Navbar />
@@ -141,7 +158,7 @@ const FlowerDetail = () => {
                         className="w-full rounded-3xl overflow-hidden shadow-xl bg-white relative border border-stone-100"
                     >
                         <img
-                            src={product.imageUrl}
+                            src={displayImage}
                             alt={product.name}
                             className="w-full h-auto aspect-square md:aspect-[4/5] object-cover"
                         />
@@ -162,8 +179,30 @@ const FlowerDetail = () => {
                                 {product.name}
                             </h1>
                             <p className="text-3xl font-medium text-maua-primary mb-6">
-                                {product.price} {product.currency || "$"}
+                                {displayPrice} {product.currency || "$"}
                             </p>
+
+                            {/* Variants Selection UI */}
+                            {product.variants && product.variants.length > 0 && (
+                                <div className="mb-6">
+                                    <h3 className="text-sm font-bold text-stone-500 uppercase mb-3">Choisir une option :</h3>
+                                    <div className="flex flex-wrap gap-3">
+                                        {product.variants.map((variant) => {
+                                            const isSelected = selectedVariant?.id === variant.id;
+                                            return (
+                                                <button
+                                                    key={variant.id}
+                                                    onClick={() => setSelectedVariant(variant)}
+                                                    className={`px-4 py-3 border-2 rounded-xl text-sm font-bold transition-all ${isSelected ? "border-maua-primary bg-maua-primary/5 text-maua-dark shadow-sm" : "border-stone-100 bg-white text-stone-600 hover:border-maua-primary/30"}`}
+                                                >
+                                                    {variant.name}
+                                                </button>
+                                            );
+                                        })}
+                                    </div>
+                                </div>
+                            )}
+
                             <p className="text-stone-600 text-lg leading-relaxed">
                                 {product.description}
                             </p>

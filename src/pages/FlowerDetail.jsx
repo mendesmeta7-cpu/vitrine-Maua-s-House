@@ -200,7 +200,7 @@ const FlowerDetail = () => {
                                             value={formData.customerName}
                                             onChange={handleInputChange}
                                             className="w-full bg-stone-50 border border-stone-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-maua-primary/20 focus:border-maua-primary transition-all"
-                                            placeholder="Jean Dupont"
+                                            placeholder="Nom complet"
                                         />
                                     </div>
                                     <div className="space-y-1">

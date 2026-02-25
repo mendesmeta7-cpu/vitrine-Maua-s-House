@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, Check, AlertCircle, ShoppingBag, Truck, CreditCard, MessageCircle } from 'lucide-react';
 import { getProductById } from '../services/productService';
 import { createOrder } from '../services/orderService';
@@ -38,11 +38,7 @@ const FlowerDetail = () => {
             try {
                 const data = await getProductById(id);
                 setProduct(data);
-                if (data?.variants?.length > 0) {
-                    setSelectedVariant(data.variants[0]);
-                } else {
-                    setSelectedVariant(null);
-                }
+                setSelectedVariant(null);
             } catch (err) {
                 console.error("Error fetching product:", err);
                 setError("Produit introuvable ou erreur de chargement.");
@@ -157,11 +153,18 @@ const FlowerDetail = () => {
                         animate={{ opacity: 1, x: 0 }}
                         className="w-full rounded-3xl overflow-hidden shadow-xl bg-white relative border border-stone-100"
                     >
-                        <img
-                            src={displayImage}
-                            alt={product.name}
-                            className="w-full h-auto aspect-square md:aspect-[4/5] object-cover"
-                        />
+                        <AnimatePresence mode="wait">
+                            <motion.img
+                                key={displayImage}
+                                src={displayImage}
+                                alt={product.name}
+                                initial={{ opacity: 0, scale: 0.95 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                exit={{ opacity: 0, scale: 0.95 }}
+                                transition={{ duration: 0.3 }}
+                                className="w-full h-auto aspect-square md:aspect-[4/5] object-cover"
+                            />
+                        </AnimatePresence>
                     </motion.div>
 
                     {/* Right: Info & Form */}
@@ -178,9 +181,18 @@ const FlowerDetail = () => {
                             <h1 className="text-4xl md:text-5xl font-serif font-bold text-maua-dark mb-4 leading-tight">
                                 {product.name}
                             </h1>
-                            <p className="text-3xl font-medium text-maua-primary mb-6">
-                                {displayPrice} {product.currency || "$"}
-                            </p>
+                            <AnimatePresence mode="wait">
+                                <motion.p
+                                    key={displayPrice}
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: 10 }}
+                                    transition={{ duration: 0.2 }}
+                                    className="text-3xl font-medium text-maua-primary mb-6"
+                                >
+                                    {displayPrice} {product.currency || "$"}
+                                </motion.p>
+                            </AnimatePresence>
 
                             {/* Variants Selection UI */}
                             {product.variants && product.variants.length > 0 && (
@@ -192,7 +204,7 @@ const FlowerDetail = () => {
                                             return (
                                                 <button
                                                     key={variant.id}
-                                                    onClick={() => setSelectedVariant(variant)}
+                                                    onClick={() => setSelectedVariant(isSelected ? null : variant)}
                                                     className={`px-4 py-3 border-2 rounded-xl text-sm font-bold transition-all ${isSelected ? "border-maua-primary bg-maua-primary/5 text-maua-dark shadow-sm" : "border-stone-100 bg-white text-stone-600 hover:border-maua-primary/30"}`}
                                                 >
                                                     {variant.name}

@@ -36,7 +36,8 @@ const AdminDashboard = () => {
         category: "innovations",
         description: "",
         imageFile: null,
-        imageUrl: ""
+        imageUrl: "",
+        imagePublicId: ""
     });
     const [formLoading, setFormLoading] = useState(false);
     const [loadingStatus, setLoadingStatus] = useState(""); // Feedback for user
@@ -120,7 +121,7 @@ const AdminDashboard = () => {
     // Modal Handlers
     const openAddModal = () => {
         setEditingProduct(null);
-        setFormData({ name: "", price: "", currency: "USD", category: "innovations", description: "", imageFile: null, imageUrl: "" });
+        setFormData({ name: "", price: "", currency: "USD", category: "innovations", description: "", imageFile: null, imageUrl: "", imagePublicId: "" });
         setLoadingStatus("");
         setIsModalOpen(true);
     };
@@ -134,6 +135,7 @@ const AdminDashboard = () => {
             category: product.category,
             description: product.description || "",
             imageUrl: product.imageUrl || "",
+            imagePublicId: product.imagePublicId || "",
             imageFile: null
         });
         setLoadingStatus("");
@@ -167,12 +169,24 @@ const AdminDashboard = () => {
             }
 
             let finalImageUrl = formData.imageUrl;
+            let finalImagePublicId = formData.imagePublicId;
 
             // 2. Image Upload
             if (formData.imageFile) {
                 setLoadingStatus("Envoi de l'image en cours...");
                 try {
-                    finalImageUrl = await uploadImage(formData.imageFile);
+                    const uploadResult = await uploadImage(formData.imageFile);
+                    finalImageUrl = uploadResult.url;
+                    finalImagePublicId = uploadResult.publicId;
+
+                    if (editingProduct && editingProduct.imagePublicId && editingProduct.imagePublicId !== finalImagePublicId) {
+                        setLoadingStatus("Suppression de l'ancienne image...");
+                        await fetch('/api/delete-image', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ public_id: editingProduct.imagePublicId })
+                        }).catch(err => console.error("Erreur suppression ancienne image:", err));
+                    }
                 } catch (uploadError) {
                     console.error("Upload failed", uploadError);
                     throw new Error("Échec de l'envoi de l'image. Vérifiez votre connexion.");
@@ -189,6 +203,7 @@ const AdminDashboard = () => {
                 category: formData.category,
                 description: formData.description,
                 imageUrl: finalImageUrl,
+                imagePublicId: finalImagePublicId || null,
                 updatedAt: new Date()
             };
 
@@ -217,8 +232,21 @@ const AdminDashboard = () => {
 
     const handleDelete = async (id) => {
         if (window.confirm("Êtes-vous sûr de vouloir supprimer ce produit ?")) {
-            await deleteProduct(id);
-            loadProducts();
+            try {
+                const productToDelete = products.find(p => p.id === id);
+                if (productToDelete && productToDelete.imagePublicId) {
+                    await fetch('/api/delete-image', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ public_id: productToDelete.imagePublicId })
+                    }).catch(err => console.error("Erreur suppression image Cloudinary:", err));
+                }
+                await deleteProduct(id);
+                loadProducts();
+            } catch (error) {
+                console.error("Erreur suppression produit:", error);
+                alert("Une erreur est survenue lors de la suppression du produit.");
+            }
         }
     };
 

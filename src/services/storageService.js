@@ -1,15 +1,21 @@
-const CLOUDINARY_URL = "https://api.cloudinary.com/v1_1/djjcqzebw/image/upload";
-const UPLOAD_PRESET = "Maua's_hause";
-
 export const uploadImage = async (file) => {
     if (!file) return null;
 
+    const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+    const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+    if (!cloudName || !uploadPreset) {
+        throw new Error("Configuration Cloudinary manquante (VITE_CLOUDINARY_CLOUD_NAME ou VITE_CLOUDINARY_UPLOAD_PRESET)");
+    }
+
+    const cloudinaryUrl = `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`;
+
     const formData = new FormData();
     formData.append("file", file);
-    formData.append("upload_preset", UPLOAD_PRESET);
+    formData.append("upload_preset", uploadPreset);
 
     try {
-        const response = await fetch(CLOUDINARY_URL, {
+        const response = await fetch(cloudinaryUrl, {
             method: "POST",
             body: formData
         });
@@ -20,7 +26,10 @@ export const uploadImage = async (file) => {
         }
 
         const data = await response.json();
-        return data.secure_url;
+        return {
+            url: data.secure_url,
+            publicId: data.public_id
+        };
     } catch (error) {
         console.error("Error uploading image to Cloudinary: ", error);
         throw error;

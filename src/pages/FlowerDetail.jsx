@@ -138,12 +138,12 @@ const FlowerDetail = () => {
                     <motion.div
                         initial={{ opacity: 0, x: -20 }}
                         animate={{ opacity: 1, x: 0 }}
-                        className="rounded-3xl overflow-hidden shadow-xl bg-white aspect-[4/5] relative border border-stone-100"
+                        className="w-full rounded-3xl overflow-hidden shadow-xl bg-white relative border border-stone-100"
                     >
                         <img
                             src={product.imageUrl}
                             alt={product.name}
-                            className="w-full h-full object-cover"
+                            className="w-full h-auto aspect-square md:aspect-[4/5] object-cover"
                         />
                     </motion.div>
 

@@ -10,25 +10,25 @@ import Footer from '../components/Footer';
 
 const OPERATOR_LOGOS = {
     VODACOM_MPESA_COD: (
-        <svg viewBox="0 10 135 40" className="h-8 md:h-10 w-auto drop-shadow-sm">
-            <text x="0" y="38" fill="#4BAA42" fontSize="28" fontWeight="900" fontFamily="Arial, Helvetica, sans-serif" letterSpacing="-1">
-                <tspan fill="#E60000">M</tspan>-PESA
-            </text>
-            <path d="M0 46 h130" stroke="#4BAA42" strokeWidth="4" />
-        </svg>
+        <img
+            src={`${import.meta.env.BASE_URL}images/logos/mpesa.png`}
+            alt="M-PESA"
+            className="h-10 sm:h-12 w-auto object-contain drop-shadow-sm"
+        />
     ),
     AIRTEL_COD: (
-        <svg viewBox="20 5 105 32" className="h-8 md:h-10 w-auto drop-shadow-sm">
-            <path d="M35 30c-5.5 0-10-4.5-10-10s4.5-10 10-10 10 4.5 10 10-4.5 10-10 10zm0-16c-3.3 0-6 2.7-6 6s2.7 6 6 6 6-2.7 6-6-2.7-6-6-6z" fill="#FF0000" />
-            <path d="M50 15v15h4v-15h-4zM60 20c0-2.8 2.2-5 5-5s5 2.2 5 5-2.2 5-5 5-5-2.2-5-5zm5-2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#FF0000" />
-            <text x="73" y="27" fontSize="18" fontWeight="bold" fill="#FF0000" fontFamily="Arial, Helvetica, sans-serif" letterSpacing="-0.5">airtel</text>
-        </svg>
+        <img
+            src={`${import.meta.env.BASE_URL}images/logos/airtel.png`}
+            alt="Airtel Money"
+            className="h-10 sm:h-12 w-auto object-contain drop-shadow-sm"
+        />
     ),
     ORANGE_COD: (
-        <svg viewBox="0 0 100 100" className="h-8 md:h-10 w-auto rounded shadow-sm">
-            <rect width="100" height="100" fill="#F16E00" />
-            <text x="50" y="86" fill="white" fontSize="22" fontWeight="bold" fontFamily="Helvetica, Arial, sans-serif" textAnchor="middle" letterSpacing="-0.5">orange</text>
-        </svg>
+        <img
+            src={`${import.meta.env.BASE_URL}images/logos/orange.png`}
+            alt="Orange Money"
+            className="h-10 sm:h-12 w-auto object-contain drop-shadow-sm rounded"
+        />
     )
 };
 

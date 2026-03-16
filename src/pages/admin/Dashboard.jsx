@@ -1,6 +1,7 @@
 // Trigger Vercel Deployment Update
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
+import { useToast } from "../../context/ToastContext";
 import { useNavigate } from "react-router-dom";
 import { getProducts, addProduct, updateProduct, deleteProduct } from "../../services/productService";
 import { getAllOrders, updateOrderStatus, deleteOrder } from "../../services/orderService";
@@ -16,6 +17,7 @@ const CATEGORIES = [
 
 const AdminDashboard = () => {
     const { logout } = useAuth();
+    const { showToast } = useToast();
     const navigate = useNavigate();
 
     // State
@@ -97,8 +99,9 @@ const AdminDashboard = () => {
             try {
                 await deleteOrder(orderId);
                 loadOrders(); // Refresh list
+                showToast("Archive supprimée.");
             } catch (err) {
-                alert("Erreur lors de la suppression.");
+                showToast("Erreur lors de la suppression.", "error");
             }
         }
     };
@@ -108,8 +111,9 @@ const AdminDashboard = () => {
             try {
                 await updateOrderStatus(orderId, 'delivered');
                 loadOrders(); // Refresh list
+                showToast("Commande livrée et archivée.");
             } catch (err) {
-                alert("Erreur lors de la mise à jour du statut.");
+                showToast("Erreur lors de la mise à jour du statut.", "error");
             }
         }
     };
@@ -182,14 +186,14 @@ const AdminDashboard = () => {
         const timeoutId = setTimeout(() => {
             setFormLoading(false);
             setLoadingStatus("");
-            alert("L'opération prend trop de temps. Vérifiez votre connexion internet ou la taille de l'image.");
+            showToast("L'opération prend trop de temps. Vérifiez votre connexion internet ou la taille de l'image.", "error");
         }, 30000);
 
         try {
             // 1. Validation Image Size
             if (formData.imageFile && formData.imageFile.size > MAX_FILE_SIZE) {
                 clearTimeout(timeoutId);
-                alert("L'image est trop volumineuse (Max 5MB).");
+                showToast("L'image est trop volumineuse (Max 5MB).", "error");
                 setFormLoading(false);
                 setLoadingStatus("");
                 return;
@@ -291,11 +295,11 @@ const AdminDashboard = () => {
             if (editingProduct) {
                 await updateProduct(editingProduct.id, productPayload);
                 clearTimeout(timeoutId); // Clear timeout on success
-                alert("Produit mis à jour avec succès !");
+                showToast("Produit mis à jour avec succès !");
             } else {
                 await addProduct({ ...productPayload, createdAt: new Date() });
                 clearTimeout(timeoutId); // Clear timeout on success
-                alert("Produit ajouté avec succès !");
+                showToast("Produit ajouté avec succès !");
             }
 
             closeModal();
@@ -304,7 +308,7 @@ const AdminDashboard = () => {
         } catch (error) {
             clearTimeout(timeoutId);
             console.error("Error saving product:", error);
-            alert(`Erreur : ${error.message || "Une erreur est survenue."}`);
+            showToast(`Erreur : ${error.message || "Une erreur est survenue."}`, "error");
         } finally {
             setFormLoading(false);
             setLoadingStatus("");
@@ -337,9 +341,10 @@ const AdminDashboard = () => {
                 }
                 await deleteProduct(id);
                 loadProducts();
+                showToast("Produit supprimé.");
             } catch (error) {
                 console.error("Erreur suppression produit:", error);
-                alert("Une erreur est survenue lors de la suppression du produit.");
+                showToast("Une erreur est survenue lors de la suppression du produit.", "error");
             }
         }
     };
@@ -359,10 +364,10 @@ const AdminDashboard = () => {
                         onClick={async () => {
                             const start = Date.now();
                             try {
-                                alert("Test 1/3: Connexion Base de données (Lecture)...");
+                                showToast("Test 1/3: Connexion Base de données (Lecture)...", "info");
                                 await getProducts();
 
-                                alert("Test 2/3: Test d'écriture (Ajout produit test)...");
+                                showToast("Test 2/3: Test d'écriture (Ajout produit test)...", "info");
                                 // Test Write
                                 const testId = await addProduct({
                                     name: "Test Connection",
@@ -373,16 +378,16 @@ const AdminDashboard = () => {
                                 });
                                 await deleteProduct(testId);
 
-                                alert("Test 3/3: Envoi Fichier (Storage)...");
+                                showToast("Test 3/3: Envoi Fichier (Storage)...", "info");
                                 // Test upload small blob
                                 const blob = new Blob(["test"], { type: "text/plain" });
                                 const file = new File([blob], "test_connection.txt", { type: "text/plain" });
                                 await uploadImage(file);
 
-                                alert("SUCCÈS TOTAL !\nTout fonctionne (Lecture, Écriture, Storage).");
+                                showToast("SUCCÈS TOTAL !\nTout fonctionne (Lecture, Écriture, Storage).");
                             } catch (e) {
                                 console.error(e);
-                                alert("ÉCHEC DU TEST :\n" + e.message + "\n\nCode: " + e.code + "\n\nConsultez la console (F12) pour plus de détails.");
+                                showToast("ÉCHEC DU TEST :\n" + e.message, "error");
                             }
                         }}
                         className="text-maua-primary hover:text-maua-primary-dark text-sm font-medium underline"

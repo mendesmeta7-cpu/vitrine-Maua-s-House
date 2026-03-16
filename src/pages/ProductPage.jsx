@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getProductById } from '../services/productService';
 import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { ArrowLeft, ShoppingBag } from 'lucide-react';
@@ -10,6 +11,7 @@ const ProductPage = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart } = useCart();
+    const { showToast } = useToast();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -69,7 +71,7 @@ const ProductPage = () => {
                         <button
                             onClick={() => {
                                 addToCart(product);
-                                alert("Ajouté au panier !");
+                                showToast("Produit ajouté au panier !");
                             }}
                             className="w-full bg-maua-primary text-white py-4 rounded-xl font-medium text-lg hover:bg-maua-primary-dark transition-colors flex items-center justify-center gap-2"
                         >

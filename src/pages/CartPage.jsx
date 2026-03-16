@@ -1,4 +1,5 @@
 import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 import { Trash2, Plus, Minus, ArrowRight, CreditCard } from 'lucide-react';
@@ -7,6 +8,7 @@ import { createOrder } from '../services/orderService';
 
 const CartPage = () => {
     const { cartItems, removeFromCart, updateQuantity, cartTotal, customerInfo } = useCart();
+    const { showToast } = useToast();
     const navigate = useNavigate();
 
     // Group items by currency
@@ -17,7 +19,7 @@ const CartPage = () => {
 
     const handlePayment = async (currency, items) => {
         if (!customerInfo) {
-            alert("Informations client manquantes. Veuillez retourner à la boutique et remplir le formulaire sur un produit.");
+            showToast("Informations client manquantes. Veuillez retourner à la boutique et remplir le formulaire sur un produit.", "error");
             return;
         }
 
@@ -45,7 +47,7 @@ const CartPage = () => {
             navigate(`/payment/${orderId}`);
         } catch (error) {
             console.error("Payment initiation failed", error);
-            alert("Erreur lors de l'initialisation de la commande.");
+            showToast("Erreur lors de l'initialisation de la commande.", "error");
         }
     };
 

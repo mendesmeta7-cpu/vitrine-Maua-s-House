@@ -5,6 +5,7 @@ import { ArrowLeft, Check, AlertCircle, ShoppingBag, Truck, CreditCard, MessageC
 import { getProductById } from '../services/productService';
 import { createOrder } from '../services/orderService';
 import { useCart } from '../context/CartContext';
+import { useToast } from '../context/ToastContext';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -12,6 +13,7 @@ const FlowerDetail = () => {
     const { id } = useParams();
     const navigate = useNavigate();
     const { addToCart, setCustomerInfo, customerInfo } = useCart();
+    const { showToast } = useToast();
     const [product, setProduct] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
@@ -74,7 +76,7 @@ const FlowerDetail = () => {
             navigate(`/payment/${orderId}`);
         } catch (err) {
             console.error("Order failed:", err);
-            alert("Une erreur est survenue lors de la commande. Veuillez réessayer.");
+            showToast("Une erreur est survenue lors de la commande. Veuillez réessayer.", "error");
             setSubmitting(false);
         }
     };
@@ -82,7 +84,7 @@ const FlowerDetail = () => {
     const handleAddToCart = () => {
         // Validate form data
         if (!formData.customerName || !formData.phone || !formData.address) {
-            alert("Veuillez remplir vos informations (Nom, Téléphone, Adresse) avant d'ajouter au panier.");
+            showToast("Veuillez remplir vos informations (Nom, Téléphone, Adresse) avant d'ajouter au panier.", "error");
             // Scroll to form
             const formElement = document.getElementById('order-form');
             if (formElement) formElement.scrollIntoView({ behavior: 'smooth' });
@@ -103,7 +105,7 @@ const FlowerDetail = () => {
             quantity: 1
         });
         // Feedback is handled by Navbar cart badge, or we could add a toast here
-        alert("Produit ajouté au panier !");
+        showToast("Produit ajouté au panier !");
     };
 
     if (loading) {

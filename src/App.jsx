@@ -10,11 +10,14 @@ import ProtectedRoute from './components/admin/ProtectedRoute';
 import Gallery from './pages/Gallery';
 import FlowerDetail from './pages/FlowerDetail';
 import ScrollHandler from './components/ScrollHandler';
+import { ToastProvider } from './context/ToastContext';
+import ToastContainer from './components/Toast';
 
 function App() {
   return (
-    <>
+    <ToastProvider>
       <ScrollHandler />
+      <ToastContainer />
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/galerie" element={<Gallery />} />
@@ -30,7 +33,7 @@ function App() {
           </ProtectedRoute>
         } />
       </Routes>
-    </>
+    </ToastProvider>
   );
 }
 

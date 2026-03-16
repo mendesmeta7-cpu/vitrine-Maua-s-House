@@ -1,4 +1,5 @@
 import { createContext, useState, useEffect, useContext } from 'react';
+import { useToast } from './ToastContext';
 
 const CartContext = createContext();
 
@@ -37,12 +38,14 @@ export const CartProvider = ({ children }) => {
         }
     }, [customerInfo]);
 
+    const { showToast } = useToast();
+
     const addToCart = (product, quantity = 1) => {
         setCartItems(prevItems => {
             const currentTotalQuantity = prevItems.reduce((total, item) => total + item.quantity, 0);
 
             if (currentTotalQuantity + quantity > MAX_CART_ITEMS) {
-                alert(`Le panier est plein (Limite : ${MAX_CART_ITEMS} articles). Impossible d'ajouter plus d'articles.`);
+                showToast(`Le panier est plein (Limite : ${MAX_CART_ITEMS} articles). Impossible d'ajouter plus d'articles.`, 'error');
                 return prevItems;
             }
 
@@ -77,7 +80,7 @@ export const CartProvider = ({ children }) => {
             const currentTotalQuantity = prevItems.reduce((total, item) => total + item.quantity, 0);
 
             if (quantityDifference > 0 && (currentTotalQuantity + quantityDifference > MAX_CART_ITEMS)) {
-                alert(`Limite de ${MAX_CART_ITEMS} articles atteinte dans le panier.`);
+                showToast(`Limite de ${MAX_CART_ITEMS} articles atteinte dans le panier.`, 'error');
                 return prevItems;
             }
 

@@ -11,6 +11,7 @@ import Gallery from './pages/Gallery';
 import FlowerDetail from './pages/FlowerDetail';
 import ScrollHandler from './components/ScrollHandler';
 import ToastContainer from './components/Toast';
+import LandingQR from './pages/LandingQR';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         <Route path="/product/:id" element={<ProductPage />} />
         <Route path="/payment/:orderId" element={<PaymentPage />} />
         <Route path="/cart" element={<CartPage />} />
+        <Route path="/qr/:id" element={<LandingQR />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={

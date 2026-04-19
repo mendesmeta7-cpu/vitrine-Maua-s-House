@@ -1,12 +1,13 @@
 // Trigger Vercel Deployment Update
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useToast } from "../../context/ToastContext";
 import { useNavigate } from "react-router-dom";
+import { QRCodeCanvas } from 'qrcode.react';
 import { getProducts, addProduct, updateProduct, deleteProduct } from "../../services/productService";
 import { getAllOrders, updateOrderStatus, deleteOrder } from "../../services/orderService";
 import { uploadImage } from "../../services/storageService";
-import { LogOut, Plus, Edit, Trash, X, Upload, LayoutDashboard, ShoppingBag, CheckCircle, AlertTriangle, Truck, History } from "lucide-react";
+import { LogOut, Plus, Edit, Trash, X, Upload, LayoutDashboard, ShoppingBag, CheckCircle, AlertTriangle, Truck, History, QrCode, Download } from "lucide-react";
 
 // Categories Configuration (Shared with Frontend ideally, but duplicated for now for simplicity)
 const CATEGORIES = [
@@ -29,6 +30,10 @@ const AdminDashboard = () => {
     const [activeTab, setActiveTab] = useState("products"); // products | orders
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
+
+    // QR State
+    const [qrModal, setQrModal] = useState({ isOpen: false, product: null, step: 'select_variant', selectedVariant: null });
+    const qrRef = useRef(null);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -149,6 +154,30 @@ const AdminDashboard = () => {
     };
 
     const closeModal = () => setIsModalOpen(false);
+
+    // QR Handlers
+    const openQRModal = (product) => {
+        if (product.variants && product.variants.length > 0) {
+            setQrModal({ isOpen: true, product, step: 'select_variant', selectedVariant: null });
+        } else {
+            setQrModal({ isOpen: true, product, step: 'show_qr', selectedVariant: null });
+        }
+    };
+
+    const closeQRModal = () => setQrModal({ isOpen: false, product: null, step: 'select_variant', selectedVariant: null });
+
+    const handleDownloadQR = () => {
+        const canvas = qrRef.current?.querySelector('canvas');
+        if (canvas) {
+            const pngUrl = canvas.toDataURL("image/png").replace("image/png", "image/octet-stream");
+            const downloadLink = document.createElement("a");
+            downloadLink.href = pngUrl;
+            downloadLink.download = `QR_${qrModal.product.name.replace(/\s+/g, '_')}${qrModal.selectedVariant ? '_' + qrModal.selectedVariant.name.replace(/\s+/g, '_') : ''}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        }
+    };
 
     // Variant Handlers
     const handleAddVariant = () => {
@@ -474,6 +503,9 @@ const AdminDashboard = () => {
                                                     <Trash size={16} /> Supprimer
                                                 </button>
                                             </div>
+                                            <button onClick={() => openQRModal(product)} className="w-full mt-2 py-2 rounded-lg bg-maua-light/20 text-maua-primary hover:bg-maua-primary hover:text-white text-sm font-bold flex items-center justify-center gap-2 transition-all">
+                                                <QrCode size={16} /> Générer QR
+                                            </button>
                                         </div>
                                     </div>
                                 ))}
@@ -795,6 +827,91 @@ const AdminDashboard = () => {
                     </div>
                 )
             }
+
+            {/* QR Modal */}
+            {qrModal.isOpen && (
+                <div className="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+                        <div className="p-6 flex justify-between items-center bg-gray-50 border-b border-gray-100">
+                            <h2 className="text-xl font-serif font-bold text-gray-800 flex items-center gap-2">
+                                <QrCode className="text-maua-primary" size={24} />
+                                QR Code Produit
+                            </h2>
+                            <button onClick={closeQRModal} className="text-gray-400 hover:text-red-500 transition-colors p-1 bg-white rounded-full shadow-sm">
+                                <X size={20} />
+                            </button>
+                        </div>
+                        
+                        <div className="p-8 flex flex-col items-center text-center">
+                            {qrModal.step === 'select_variant' && qrModal.product && (
+                                <div className="w-full">
+                                    <h3 className="text-lg font-bold text-maua-dark mb-2">{qrModal.product.name}</h3>
+                                    <p className="text-sm text-gray-500 mb-6">Ce produit possède plusieurs variantes. Veuillez choisir celle que le QR Code ciblera.</p>
+                                    
+                                    <div className="space-y-3 max-h-60 overflow-y-auto pr-2">
+                                        <button
+                                            onClick={() => setQrModal(prev => ({ ...prev, step: 'show_qr', selectedVariant: null }))}
+                                            className="w-full text-left px-4 py-3 border border-gray-200 rounded-xl hover:border-maua-primary hover:bg-maua-primary/5 transition-all focus:ring-2 focus:ring-maua-primary"
+                                        >
+                                            <div className="font-bold text-gray-800">Le produit Global</div>
+                                            <div className="text-xs text-gray-500 mt-1">Général (redirige vers le choix)</div>
+                                        </button>
+                                        {qrModal.product.variants.map(v => (
+                                            <button
+                                                key={v.id}
+                                                onClick={() => setQrModal(prev => ({ ...prev, step: 'show_qr', selectedVariant: v }))}
+                                                className="w-full text-left px-4 py-3 border border-gray-200 rounded-xl hover:border-maua-primary hover:bg-maua-primary/5 transition-all focus:ring-2 focus:ring-maua-primary flex justify-between items-center"
+                                            >
+                                                <div>
+                                                    <div className="font-bold text-gray-800">{v.name}</div>
+                                                    <div className="text-xs text-gray-500 mt-1">Variante spécifique</div>
+                                                </div>
+                                                <div className="font-medium text-maua-primary">{v.price} {qrModal.product.currency || "$"}</div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {qrModal.step === 'show_qr' && qrModal.product && (
+                                <div className="w-full flex flex-col items-center">
+                                    <h3 className="text-lg font-bold text-maua-dark mb-1">{qrModal.product.name}</h3>
+                                    {qrModal.selectedVariant && (
+                                        <div className="inline-block px-3 py-1 bg-maua-light/30 text-maua-primary rounded-full text-xs font-bold uppercase tracking-wider mb-4">
+                                            {qrModal.selectedVariant.name}
+                                        </div>
+                                    )}
+                                    <p className="text-xs text-gray-400 mb-6 break-all w-full line-clamp-2">
+                                        {`${import.meta.env.VITE_BASE_URL || window.location.origin}/qr/${qrModal.product.id}${qrModal.selectedVariant ? '?v=' + qrModal.selectedVariant.id : ''}`}
+                                    </p>
+
+                                    <div 
+                                        className="bg-white p-4 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.05)] border border-gray-100 flex justify-center mb-8"
+                                        ref={qrRef}
+                                    >
+                                        <QRCodeCanvas
+                                            value={`${import.meta.env.VITE_BASE_URL || window.location.origin}/qr/${qrModal.product.id}${qrModal.selectedVariant ? '?v=' + qrModal.selectedVariant.id : ''}`}
+                                            size={256}
+                                            bgColor={"#ffffff"}
+                                            fgColor={"#000000"}
+                                            level={"H"}
+                                            includeMargin={false}
+                                        />
+                                    </div>
+
+                                    <button
+                                        onClick={handleDownloadQR}
+                                        className="w-full bg-maua-dark text-white py-4 rounded-xl font-bold flex items-center justify-center gap-3 hover:bg-maua-primary transition-colors hover:shadow-lg transform hover:-translate-y-0.5 active:translate-y-0"
+                                    >
+                                        <Download size={20} />
+                                        Télécharger en PNG
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                </div>
+            )}
         </div >
     );
 };

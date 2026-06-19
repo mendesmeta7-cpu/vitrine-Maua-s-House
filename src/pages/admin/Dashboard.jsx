@@ -29,6 +29,7 @@ const AdminDashboard = () => {
     const [error, setError] = useState(null);
     const [activeTab, setActiveTab] = useState("products"); // products | orders
     const [isModalOpen, setIsModalOpen] = useState(false);
+    const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
 
     // QR State
@@ -423,7 +424,7 @@ const AdminDashboard = () => {
                     >
                         Tester la connexion (Complet)
                     </button>
-                    <button onClick={handleLogout} className="text-gray-500 hover:text-red-600 flex items-center gap-2 text-sm font-medium transition-colors">
+                    <button onClick={() => setIsLogoutModalOpen(true)} className="text-gray-500 hover:text-red-600 flex items-center gap-2 text-sm font-medium transition-colors">
                         <LogOut size={18} /> Déconnexion
                     </button>
                 </div>
@@ -908,6 +909,35 @@ const AdminDashboard = () => {
                                     </button>
                                 </div>
                             )}
+                        </div>
+                    </div>
+                </div>
+            )}
+            {/* Logout Modal */}
+            {isLogoutModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+                    <div className="bg-white rounded-2xl shadow-2xl w-full max-w-sm p-6 text-center">
+                        <div className="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4">
+                            <LogOut size={32} />
+                        </div>
+                        <h2 className="text-xl font-bold text-gray-800 mb-2">Déconnexion</h2>
+                        <p className="text-gray-500 mb-6">Êtes-vous sûr de vouloir vous déconnecter ?</p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={() => setIsLogoutModalOpen(false)}
+                                className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors"
+                            >
+                                Annuler
+                            </button>
+                            <button
+                                onClick={() => {
+                                    setIsLogoutModalOpen(false);
+                                    handleLogout();
+                                }}
+                                className="flex-1 py-3 bg-red-500 hover:bg-red-600 text-white font-bold rounded-xl transition-colors shadow-lg shadow-red-500/30"
+                            >
+                                Confirmer
+                            </button>
                         </div>
                     </div>
                 </div>

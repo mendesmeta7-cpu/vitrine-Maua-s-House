@@ -56,12 +56,23 @@ const FlowerDetail = () => {
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
+    const getActivePriceInfo = (item) => {
+        const now = new Date();
+        if (item && item.promoPrice && item.promoExpiresAt && new Date(item.promoExpiresAt) > now) {
+            return { price: item.promoPrice, originalPrice: item.price, isPromo: true };
+        }
+        return { price: item ? item.price : 0, originalPrice: null, isPromo: false };
+    };
+
     const handleOrderSubmit = async (e) => {
         e.preventDefault();
         setSubmitting(true);
         try {
+            const targetItem = selectedVariant || product;
+            const priceInfo = getActivePriceInfo(targetItem);
+            
             const finalName = selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name;
-            const finalPrice = selectedVariant ? selectedVariant.price : product.price;
+            const finalPrice = priceInfo.price;
             const finalImage = (selectedVariant && selectedVariant.imageUrl) ? selectedVariant.imageUrl : product.imageUrl;
 
             const orderId = await createOrder({
@@ -91,8 +102,11 @@ const FlowerDetail = () => {
             return;
         }
 
+        const targetItem = selectedVariant || product;
+        const priceInfo = getActivePriceInfo(targetItem);
+        
         const finalName = selectedVariant ? `${product.name} - ${selectedVariant.name}` : product.name;
-        const finalPrice = selectedVariant ? selectedVariant.price : product.price;
+        const finalPrice = priceInfo.price;
         const finalImage = (selectedVariant && selectedVariant.imageUrl) ? selectedVariant.imageUrl : product.imageUrl;
 
         setCustomerInfo(formData);
@@ -132,7 +146,9 @@ const FlowerDetail = () => {
         );
     }
 
-    const displayPrice = selectedVariant ? selectedVariant.price : product.price;
+    const targetItemDisplay = selectedVariant || product;
+    const priceInfoDisplay = getActivePriceInfo(targetItemDisplay);
+    const displayPrice = priceInfoDisplay.price;
     const displayImage = (selectedVariant && selectedVariant.imageUrl) ? selectedVariant.imageUrl : product.imageUrl;
 
     return (
@@ -184,16 +200,23 @@ const FlowerDetail = () => {
                                 {product.name}
                             </h1>
                             <AnimatePresence mode="wait">
-                                <motion.p
+                                <motion.div
                                     key={displayPrice}
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: 10 }}
                                     transition={{ duration: 0.2 }}
-                                    className="text-3xl font-medium text-maua-primary mb-6"
+                                    className="flex items-center gap-3 mb-6"
                                 >
-                                    {displayPrice} {product.currency || "$"}
-                                </motion.p>
+                                    <span className="text-3xl font-medium text-maua-primary">
+                                        {displayPrice} {product.currency || "$"}
+                                    </span>
+                                    {priceInfoDisplay.isPromo && (
+                                        <span className="text-xl text-stone-400 line-through font-medium">
+                                            {priceInfoDisplay.originalPrice} {product.currency || "$"}
+                                        </span>
+                                    )}
+                                </motion.div>
                             </AnimatePresence>
 
                             {/* Variants Selection UI */}

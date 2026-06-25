@@ -24,6 +24,16 @@ export default async function handler(req, res) {
         const orderData = req.body;
         let validPrice = 0;
 
+        const getActivePrice = (itemData) => {
+            if (itemData.promoPrice && itemData.promoExpiresAt) {
+                const expiresAt = new Date(itemData.promoExpiresAt);
+                if (expiresAt > new Date()) {
+                    return Number(itemData.promoPrice);
+                }
+            }
+            return Number(itemData.price);
+        };
+
         if (orderData.items && Array.isArray(orderData.items)) {
             // Traitement d'un panier
             for (let item of orderData.items) {
@@ -36,18 +46,19 @@ export default async function handler(req, res) {
                     let priceMatch = false;
                     const itemPriceReceived = Number(item.price);
                     
-                    if (itemPriceReceived === Number(product.price)) {
+                    const activeBasePrice = getActivePrice(product);
+                    if (itemPriceReceived === activeBasePrice) {
                         priceMatch = true;
                     } else if (product.variants) {
                         for (let v of product.variants) {
-                            if (Number(v.price) === itemPriceReceived) {
+                            if (getActivePrice(v) === itemPriceReceived) {
                                 priceMatch = true;
                                 break;
                             }
                         }
                     }
                     
-                    const finalItemPrice = priceMatch ? itemPriceReceived : Number(product.price);
+                    const finalItemPrice = priceMatch ? itemPriceReceived : activeBasePrice;
                     validPrice += finalItemPrice * Number(item.quantity || 1);
                 }
             }
@@ -59,18 +70,19 @@ export default async function handler(req, res) {
                 let priceMatch = false;
                 const priceReceived = Number(orderData.productPrice);
                 
-                if (priceReceived === Number(product.price)) {
+                const activeBasePrice = getActivePrice(product);
+                if (priceReceived === activeBasePrice) {
                     priceMatch = true;
                 } else if (product.variants) {
                     for (let v of product.variants) {
-                        if (Number(v.price) === priceReceived) {
+                        if (getActivePrice(v) === priceReceived) {
                             priceMatch = true;
                             break;
                         }
                     }
                 }
                 
-                validPrice = priceMatch ? priceReceived : Number(product.price);
+                validPrice = priceMatch ? priceReceived : activeBasePrice;
             }
         } else {
             validPrice = Number(orderData.productPrice) || 0;

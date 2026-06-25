@@ -2,6 +2,7 @@ import Navbar from '../components/Navbar';
 import Hero from '../components/Hero';
 import About from '../components/About';
 import Services from '../components/Services';
+import PromoSlider from '../components/PromoSlider';
 import FloralGallery from '../components/FloralGallery';
 import Contact from '../components/Contact';
 import Footer from '../components/Footer';
@@ -14,6 +15,7 @@ const Home = () => {
             <Hero />
             <About />
             <Services />
+            <PromoSlider />
             <FloralGallery />
             <Contact />
             <Footer />

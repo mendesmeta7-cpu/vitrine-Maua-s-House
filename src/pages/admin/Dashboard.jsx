@@ -5,9 +5,10 @@ import { useToast } from "../../context/ToastContext";
 import { useNavigate } from "react-router-dom";
 import { QRCodeCanvas } from 'qrcode.react';
 import { getProducts, addProduct, updateProduct, deleteProduct } from "../../services/productService";
+import { setPromo, removePromo } from "../../services/promoService";
 import { getAllOrders, updateOrderStatus, deleteOrder } from "../../services/orderService";
 import { uploadImage } from "../../services/storageService";
-import { LogOut, Plus, Edit, Trash, X, Upload, LayoutDashboard, ShoppingBag, CheckCircle, AlertTriangle, Truck, History, QrCode, Download } from "lucide-react";
+import { LogOut, Plus, Edit, Trash, X, Upload, LayoutDashboard, ShoppingBag, CheckCircle, AlertTriangle, Truck, History, QrCode, Download, Tag, Clock } from "lucide-react";
 
 // Categories Configuration (Shared with Frontend ideally, but duplicated for now for simplicity)
 const CATEGORIES = [
@@ -31,6 +32,8 @@ const AdminDashboard = () => {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isLogoutModalOpen, setIsLogoutModalOpen] = useState(false);
     const [editingProduct, setEditingProduct] = useState(null);
+    const [isPromoModalOpen, setIsPromoModalOpen] = useState(false);
+    const [promoForm, setPromoForm] = useState({ productId: "", variantId: "", promoPrice: "", durationDays: "3" });
 
     // QR State
     const [qrModal, setQrModal] = useState({ isOpen: false, product: null, step: 'select_variant', selectedVariant: null });
@@ -127,6 +130,38 @@ const AdminDashboard = () => {
     const handleLogout = async () => {
         await logout();
         navigate("/login");
+    };
+
+    const openPromoModal = () => {
+        setPromoForm({ productId: "", variantId: "", promoPrice: "", durationDays: "3" });
+        setIsPromoModalOpen(true);
+    };
+
+    const handlePromoSubmit = async (e) => {
+        e.preventDefault();
+        try {
+            const expiresAt = new Date();
+            expiresAt.setDate(expiresAt.getDate() + Number(promoForm.durationDays));
+            
+            await setPromo(promoForm.productId, promoForm.variantId || null, promoForm.promoPrice, expiresAt.toISOString());
+            showToast("Promotion appliquée avec succès !");
+            setIsPromoModalOpen(false);
+            loadProducts(); // refresh to show updated promos
+        } catch (err) {
+            showToast("Erreur lors de l'application de la promo.", "error");
+        }
+    };
+
+    const handleRemovePromo = async (productId, variantId = null) => {
+        if (window.confirm("Voulez-vous vraiment annuler cette promotion ?")) {
+            try {
+                await removePromo(productId, variantId);
+                showToast("Promotion annulée.");
+                loadProducts();
+            } catch (err) {
+                showToast("Erreur lors de l'annulation.", "error");
+            }
+        }
     };
 
     // Modal Handlers
@@ -466,6 +501,13 @@ const AdminDashboard = () => {
                         Historique
                         {activeTab === "history" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-maua-dark rounded-t-full"></span>}
                     </button>
+                    <button
+                        onClick={() => setActiveTab("promos")}
+                        className={`pb-3 px-2 font-medium text-sm transition-colors relative flex items-center gap-2 ${activeTab === "promos" ? "text-maua-dark" : "text-gray-400 hover:text-gray-600"}`}
+                    >
+                        Offres Spéciales
+                        {activeTab === "promos" && <span className="absolute bottom-0 left-0 w-full h-0.5 bg-maua-dark rounded-t-full"></span>}
+                    </button>
                 </div>
 
                 {activeTab === "products" ? (
@@ -513,6 +555,76 @@ const AdminDashboard = () => {
                             </div>
                         )}
                     </>
+                ) : activeTab === "promos" ? (
+                    <div>
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-lg font-bold text-gray-800 flex items-center gap-2">
+                                <Tag className="text-maua-primary" /> Annonces & Promotions
+                            </h2>
+                            <button onClick={openPromoModal} className="bg-maua-dark hover:bg-black text-white px-4 py-2 rounded-lg flex items-center gap-2 text-sm font-medium transition-colors shadow-sm">
+                                <Plus size={18} /> Créer une annonce
+                            </button>
+                        </div>
+                        {loading ? (
+                            <div className="text-center py-12 text-gray-500">Chargement...</div>
+                        ) : (
+                            <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                                <div className="overflow-x-auto">
+                                    <table className="w-full text-left text-sm text-gray-600">
+                                        <thead className="bg-gray-50 text-xs uppercase font-bold text-gray-500">
+                                            <tr>
+                                                <th className="px-6 py-4">Produit/Variante</th>
+                                                <th className="px-6 py-4">Prix Original</th>
+                                                <th className="px-6 py-4">Prix Promo</th>
+                                                <th className="px-6 py-4">Expiration</th>
+                                                <th className="px-6 py-4">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody className="divide-y divide-gray-100">
+                                            {products.map(p => {
+                                                const promos = [];
+                                                const now = new Date();
+                                                if (p.promoPrice && p.promoExpiresAt) {
+                                                    promos.push({ ...p, isVariant: false });
+                                                }
+                                                if (p.variants) {
+                                                    p.variants.forEach(v => {
+                                                        if (v.promoPrice && v.promoExpiresAt) {
+                                                            promos.push({ ...p, ...v, isVariant: true, variantId: v.id, productId: p.id, baseName: p.name });
+                                                        }
+                                                    });
+                                                }
+                                                return promos.map((promo, idx) => {
+                                                    const isExpired = new Date(promo.promoExpiresAt) < now;
+                                                    return (
+                                                        <tr key={`${p.id}-${idx}`} className="hover:bg-gray-50/50">
+                                                            <td className="px-6 py-4 font-bold text-gray-900">
+                                                                {promo.isVariant ? `${promo.baseName} - ${promo.name}` : promo.name}
+                                                                {isExpired && <span className="ml-2 text-[10px] uppercase font-bold bg-red-100 text-red-600 px-2 py-0.5 rounded">Expiré</span>}
+                                                            </td>
+                                                            <td className="px-6 py-4 text-stone-400 line-through">{promo.price} {promo.currency || "$"}</td>
+                                                            <td className="px-6 py-4 text-maua-primary font-bold">{promo.promoPrice} {promo.currency || "$"}</td>
+                                                            <td className="px-6 py-4">
+                                                                <div className="flex items-center gap-1">
+                                                                    <Clock size={14} className={isExpired ? "text-red-400" : "text-green-500"} />
+                                                                    {new Date(promo.promoExpiresAt).toLocaleDateString()} {new Date(promo.promoExpiresAt).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                                                </div>
+                                                            </td>
+                                                            <td className="px-6 py-4">
+                                                                <button onClick={() => handleRemovePromo(promo.isVariant ? promo.productId : promo.id, promo.isVariant ? promo.variantId : null)} className="text-red-500 hover:text-red-700 font-medium text-xs flex items-center gap-1">
+                                                                    <Trash size={14} /> Révoquer
+                                                                </button>
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                });
+                                            })}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        )}
+                    </div>
                 ) : (
                     <div>
                         <div className="flex justify-between items-center mb-6">
@@ -913,6 +1025,81 @@ const AdminDashboard = () => {
                     </div>
                 </div>
             )}
+
+            {isPromoModalOpen && (
+                <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4 backdrop-blur-sm">
+                    <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md p-8 animate-in fade-in zoom-in-95 duration-200">
+                        <div className="flex justify-between items-center mb-6">
+                            <h2 className="text-2xl font-serif font-bold text-gray-800">Nouvelle Annonce</h2>
+                            <button onClick={() => setIsPromoModalOpen(false)} className="text-gray-400 hover:text-red-500 transition-colors p-1 bg-gray-50 rounded-full"><X size={20} /></button>
+                        </div>
+                        <form onSubmit={handlePromoSubmit} className="space-y-5">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5">Sélectionner un Produit</label>
+                                <select 
+                                    required 
+                                    value={promoForm.productId} 
+                                    onChange={(e) => setPromoForm({...promoForm, productId: e.target.value, variantId: ""})}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-maua-primary outline-none"
+                                >
+                                    <option value="">Sélectionnez un produit...</option>
+                                    {products.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                                </select>
+                            </div>
+                            
+                            {promoForm.productId && products.find(p => p.id === promoForm.productId)?.variants?.length > 0 && (
+                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                                    <label className="block text-sm font-bold text-gray-700 mb-1.5">Cible de la promotion</label>
+                                    <select 
+                                        value={promoForm.variantId} 
+                                        onChange={(e) => setPromoForm({...promoForm, variantId: e.target.value})}
+                                        className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-maua-primary outline-none"
+                                    >
+                                        <option value="">Tout le produit</option>
+                                        {products.find(p => p.id === promoForm.productId).variants.map(v => (
+                                            <option key={v.id} value={v.id}>Variante : {v.name} (Prix normal: {v.price})</option>
+                                        ))}
+                                    </select>
+                                </motion.div>
+                            )}
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5">Prix Promotionnel</label>
+                                <input 
+                                    type="number" 
+                                    required 
+                                    step="0.01" 
+                                    min="0"
+                                    value={promoForm.promoPrice} 
+                                    onChange={(e) => setPromoForm({...promoForm, promoPrice: e.target.value})}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-maua-primary outline-none"
+                                    placeholder="Nouveau prix..."
+                                />
+                            </div>
+
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1.5">Durée de l'offre</label>
+                                <select 
+                                    value={promoForm.durationDays} 
+                                    onChange={(e) => setPromoForm({...promoForm, durationDays: e.target.value})}
+                                    className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-maua-primary outline-none"
+                                >
+                                    <option value="1">1 jour</option>
+                                    <option value="3">3 jours</option>
+                                    <option value="7">1 semaine</option>
+                                    <option value="14">2 semaines</option>
+                                </select>
+                            </div>
+
+                            <div className="pt-6 flex gap-3">
+                                <button type="button" onClick={() => setIsPromoModalOpen(false)} className="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 font-bold rounded-xl transition-colors">Annuler</button>
+                                <button type="submit" className="flex-1 py-3 bg-maua-dark text-white font-bold rounded-xl hover:bg-maua-primary shadow-lg shadow-maua-dark/20 transition-all">Publier</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            )}
+
             {/* Logout Modal */}
             {isLogoutModalOpen && (
                 <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">

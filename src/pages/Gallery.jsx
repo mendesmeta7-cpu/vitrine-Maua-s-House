@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Calendar, Heart, Search, Filter } from 'lucide-react';
+import { Sparkles, Calendar, Heart, Filter, Tag } from 'lucide-react';
 import { getProducts } from '../services/productService';
 import { useNavigate } from 'react-router-dom';
 import Navbar from '../components/Navbar';
@@ -8,6 +8,7 @@ import Footer from '../components/Footer';
 
 const CATEGORY_CONFIG = {
     'all': { label: 'Tout voir', icon: Filter },
+    'promos': { label: 'Offres Spéciales', icon: Tag },
     'innovations': { label: 'Célébrations', icon: Calendar },
     'ceremonies': { label: 'Hommages', icon: Sparkles },
     'amour': { label: 'Amour', icon: Heart }
@@ -39,10 +40,45 @@ const Gallery = () => {
     useEffect(() => {
         if (activeCategory === 'all') {
             setFilteredProducts(products);
+        } else if (activeCategory === 'promos') {
+            const now = new Date();
+            setFilteredProducts(products.filter(p => {
+                const basePromoActive = p.promoPrice && p.promoExpiresAt && new Date(p.promoExpiresAt) > now;
+                const variantPromoActive = p.variants?.some(v => v.promoPrice && v.promoExpiresAt && new Date(v.promoExpiresAt) > now);
+                return basePromoActive || variantPromoActive;
+            }));
         } else {
             setFilteredProducts(products.filter(p => p.category === activeCategory));
         }
     }, [activeCategory, products]);
+
+    const renderPrice = (flower) => {
+        const now = new Date();
+        let minPromo = null;
+
+        if (flower.promoPrice && flower.promoExpiresAt && new Date(flower.promoExpiresAt) > now) {
+            minPromo = flower.promoPrice;
+        }
+
+        if (flower.variants) {
+            flower.variants.forEach(v => {
+                if (v.promoPrice && v.promoExpiresAt && new Date(v.promoExpiresAt) > now) {
+                    if (minPromo === null || v.promoPrice < minPromo) minPromo = v.promoPrice;
+                }
+            });
+        }
+
+        if (minPromo !== null) {
+            return (
+                <div className="flex items-center gap-2">
+                    <span className="font-serif text-xl font-bold text-maua-primary">{minPromo} {flower.currency || "$"}</span>
+                    <span className="font-serif text-sm font-medium text-stone-400 line-through">{flower.price} {flower.currency || "$"}</span>
+                </div>
+            );
+        }
+
+        return <span className="font-serif text-xl font-bold text-maua-dark">{flower.price} {flower.currency || "$"}</span>;
+    };
 
     return (
         <div className="bg-maua-bg min-h-screen font-sans selection:bg-maua-primary selection:text-white">
@@ -134,9 +170,7 @@ const Gallery = () => {
                                             <span className="text-xs font-bold tracking-wider text-maua-primary uppercase bg-maua-light/20 px-2 py-1 rounded">
                                                 {CATEGORY_CONFIG[flower.category]?.label || flower.category}
                                             </span>
-                                            <span className="font-serif text-xl font-bold text-maua-dark">
-                                                {flower.price} {flower.currency || "$"}
-                                            </span>
+                                            {renderPrice(flower)}
                                         </div>
                                         <h3 className="text-xl font-serif font-bold text-stone-800 mb-2 group-hover:text-maua-primary transition-colors">
                                             {flower.name}

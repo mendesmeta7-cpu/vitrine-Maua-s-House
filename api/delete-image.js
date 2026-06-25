@@ -1,5 +1,18 @@
-// api/delete-image.js
 import { v2 as cloudinary } from 'cloudinary';
+import admin from 'firebase-admin';
+
+if (!admin.apps.length) {
+    if (process.env.FIREBASE_SERVICE_ACCOUNT) {
+        try {
+            const serviceAccount = JSON.parse(process.env.FIREBASE_SERVICE_ACCOUNT);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount)
+            });
+        } catch (e) {
+            console.error("Failed to parse FIREBASE_SERVICE_ACCOUNT:", e);
+        }
+    }
+}
 
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -14,9 +27,21 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' });
   }
 
+  // Vérification de l'authentification
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+    return res.status(401).json({ error: 'Unauthorized: No token provided' });
+  }
+
+  const token = authHeader.split('Bearer ')[1];
+  try {
+    await admin.auth().verifyIdToken(token);
+  } catch (error) {
+    return res.status(403).json({ error: 'Forbidden: Invalid token' });
+  }
+
   const { public_id } = req.body;
   console.log('--- API /delete-image ---');
-  console.log('Payload reçu:', req.body);
   console.log('Public ID cible:', public_id);
 
   if (!public_id) {

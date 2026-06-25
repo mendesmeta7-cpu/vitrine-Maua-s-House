@@ -1,4 +1,5 @@
 import admin from 'firebase-admin';
+import crypto from 'crypto';
 
 if (!admin.apps.length) {
     if (process.env.FIREBASE_SERVICE_ACCOUNT) {
@@ -41,7 +42,30 @@ export default async function handler(req, res) {
     }
 
     const signature = req.headers['x-pawapay-signature'];
-    // TODO: Verify signature using your secret if available for security
+    
+    if (process.env.PAWAPAY_WEBHOOK_SECRET) {
+        if (!signature) {
+            console.error("Signature manquante.");
+            return res.status(401).json({ message: 'Unauthorized' });
+        }
+
+        try {
+            // Remarque: La vérification idéale nécessite le raw body (req.rawBody). 
+            // Ici, nous utilisons JSON.stringify qui fonctionne si la structure n'a pas été altérée.
+            const payloadString = JSON.stringify(req.body);
+            const hmac = crypto.createHmac('sha512', process.env.PAWAPAY_WEBHOOK_SECRET);
+            const expectedSignature = hmac.update(payloadString).digest('hex');
+
+            // Comparaison simple pour l'exemple (utiliser timingSafeEqual dans l'idéal si les formats correspondent toujours)
+            if (signature !== expectedSignature) {
+                console.error("Signature invalide.");
+                return res.status(403).json({ message: 'Forbidden' });
+            }
+        } catch (e) {
+            console.error("Erreur de vérification de la signature:", e);
+            return res.status(500).json({ message: 'Internal Server Error' });
+        }
+    }
 
     const events = req.body;
     // PawaPay might send an array or single object depending on configuration, 
@@ -49,8 +73,8 @@ export default async function handler(req, res) {
     // Adjust based on actual payload structure if it's a list.
 
     const event = Array.isArray(events) ? events[0] : events;
-
-    console.log("Webhook received:", JSON.stringify(event));
+    // Log nettoyé des données de payload
+    console.log(`Traitement du webhook PawaPay...`);
 
     try {
         const { depositId, status, failCode } = event;

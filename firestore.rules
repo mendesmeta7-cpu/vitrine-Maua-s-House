@@ -1,0 +1,25 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+  
+    // Accès administrateur global : tout utilisateur authentifié avec token valide
+    function isAdmin() {
+      return request.auth != null;
+    }
+
+    match /products/{productId} {
+      // Les produits sont lisibles par tout le monde (catalogue public)
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /orders/{orderId} {
+      // Seul le client connaissant l'ID exact de la commande peut la lire (suivi de paiement)
+      allow get: if true;
+      // Impossible de lister toutes les commandes sans être admin
+      allow list: if isAdmin();
+      // Aucune écriture depuis le client. Tout passe par l'API Serverless.
+      allow write: if isAdmin();
+    }
+  }
+}

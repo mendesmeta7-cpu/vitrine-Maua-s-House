@@ -23,9 +23,9 @@ export default async function handler(req, res) {
         return res.status(405).json({ message: 'Method Not Allowed' });
     }
 
-    const { amount, currency, operator, phoneNumber, orderId } = req.body;
+    const { currency, operator, phoneNumber, orderId } = req.body;
 
-    if (!amount || !operator || !phoneNumber || !orderId) {
+    if (!operator || !phoneNumber || !orderId) {
         return res.status(400).json({ message: 'Missing required fields' });
     }
 
@@ -38,8 +38,20 @@ export default async function handler(req, res) {
     }
 
     try {
+        const orderRef = db.collection('orders').doc(orderId);
+        const orderSnap = await orderRef.get();
+        if (!orderSnap.exists) {
+            return res.status(404).json({ message: 'Order not found' });
+        }
+        const orderData = orderSnap.data();
+        const secureAmount = orderData.catalog_price || 0;
+
+        if (secureAmount <= 0) {
+            return res.status(400).json({ message: 'Invalid order amount' });
+        }
+
         // Save depositId to Firestore BEFORE initiating payment to ensure webhook can find it
-        await db.collection('orders').doc(orderId).update({
+        await orderRef.update({
             'paymentInfo.depositId': depositId,
             'paymentInfo.operator': operator,
             'paymentInfo.phoneNumber': phoneNumber,
@@ -53,10 +65,10 @@ export default async function handler(req, res) {
         // Force amount formatting based on currency
         let formattedAmount;
         if (currency === 'CDF') {
-            formattedAmount = Math.floor(Number(amount)).toString();
+            formattedAmount = Math.floor(Number(secureAmount)).toString();
         } else {
             // For USD or others, allow 2 decimals
-            formattedAmount = Number(amount).toFixed(2);
+            formattedAmount = Number(secureAmount).toFixed(2);
         }
 
         const payload = {
@@ -71,8 +83,6 @@ export default async function handler(req, res) {
                 }
             }
         };
-
-        console.log("Initiating PawaPay deposit:", JSON.stringify(payload));
 
         const fullUrl = `${process.env.PAWAPAY_API_URL}/v2/deposits`;
 

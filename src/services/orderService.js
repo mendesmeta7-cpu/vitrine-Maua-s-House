@@ -1,28 +1,24 @@
-import { db } from "../firebase";
-import { collection, addDoc, serverTimestamp, doc, updateDoc, getDoc, query, orderBy, getDocs, deleteDoc } from "firebase/firestore";
+import { db, auth } from "../firebase";
+import { collection, doc, getDoc, query, orderBy, getDocs } from "firebase/firestore";
 
 const ORDERS_COLLECTION = "orders";
 
 export const createOrder = async (orderData) => {
     try {
-        // Ensure productPrice is a valid number to prevent Firestore NaN errors
-        let validPrice = 0;
-        if (orderData.productPrice !== undefined && orderData.productPrice !== null) {
-            const priceStr = String(orderData.productPrice).replace(/,/g, '.').replace(/[^0-9.-]+/g, "");
-            validPrice = parseFloat(priceStr);
-            if (isNaN(validPrice)) validPrice = 0;
-        }
-
-        const docRef = await addDoc(collection(db, ORDERS_COLLECTION), {
-            ...orderData,
-            status: 'pending',
-            paymentStatus: 'pending',
-            catalog_price: validPrice,
-            paid_amount: validPrice,
-            paymentInfo: {},
-            createdAt: serverTimestamp()
+        const response = await fetch('/api/create-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(orderData)
         });
-        return docRef.id;
+
+        if (!response.ok) {
+            throw new Error('Failed to create order via API');
+        }
+        
+        const data = await response.json();
+        return data.id;
     } catch (error) {
         console.error("Error creating order: ", error);
         throw error;
@@ -47,12 +43,26 @@ export const getOrderById = async (orderId) => {
 
 export const updateOrderStatus = async (orderId, status, additionalData = {}) => {
     try {
-        const orderRef = doc(db, ORDERS_COLLECTION, orderId);
-        await updateDoc(orderRef, {
-            status: status,
-            updatedAt: serverTimestamp(),
-            ...additionalData
+        const user = auth.currentUser;
+        const token = user ? await user.getIdToken() : '';
+
+        const response = await fetch('/api/update-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                action: 'update_status',
+                orderId,
+                status,
+                additionalData
+            })
         });
+
+        if (!response.ok) {
+            throw new Error('Failed to update order status via API');
+        }
     } catch (error) {
         console.error("Error updating order status:", error);
         throw error;
@@ -72,10 +82,27 @@ export const getAllOrders = async () => {
         throw error;
     }
 };
+
 export const deleteOrder = async (orderId) => {
     try {
-        const orderRef = doc(db, ORDERS_COLLECTION, orderId);
-        await deleteDoc(orderRef);
+        const user = auth.currentUser;
+        const token = user ? await user.getIdToken() : '';
+
+        const response = await fetch('/api/update-order', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify({
+                action: 'delete',
+                orderId
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to delete order via API');
+        }
     } catch (error) {
         console.error("Error deleting order:", error);
         throw error;

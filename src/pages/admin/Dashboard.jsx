@@ -1047,8 +1047,8 @@ const AdminDashboard = () => {
                                 </select>
                             </div>
                             
-                            {promoForm.productId && products.find(p => p.id === promoForm.productId)?.variants?.length > 0 && (
-                                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }}>
+                            {promoForm.productId && (products.find(p => p.id === promoForm.productId)?.variants || []).length > 0 && (
+                                <div className="animate-in fade-in slide-in-from-top-2 duration-300">
                                     <label className="block text-sm font-bold text-gray-700 mb-1.5">Cible de la promotion</label>
                                     <select 
                                         value={promoForm.variantId} 
@@ -1056,11 +1056,11 @@ const AdminDashboard = () => {
                                         className="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-maua-primary outline-none"
                                     >
                                         <option value="">Tout le produit</option>
-                                        {products.find(p => p.id === promoForm.productId).variants.map(v => (
+                                        {(products.find(p => p.id === promoForm.productId)?.variants || []).map(v => (
                                             <option key={v.id} value={v.id}>Variante : {v.name} (Prix normal: {v.price})</option>
                                         ))}
                                     </select>
-                                </motion.div>
+                                </div>
                             )}
 
                             <div>
